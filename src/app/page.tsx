@@ -12,7 +12,7 @@ export default function Home() {
     </div>
     <div className="flex flex-col items-center justify-center mt-5">
     <Link href="/round-1">
-        <Button className="bg-primary text-white rounded-md p-4 hover:bg-secondary">Round 1 </Button>
+        <Button className="bg-primary text-primary-foreground rounded-lg p-4 hover:invert">Round 1 </Button>
       </Link>
     </div>
     
