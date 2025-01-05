@@ -14,3 +14,4 @@
 >Use git conventionals commits for commit messages
 
 [Git Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
+.
