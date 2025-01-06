@@ -1,23 +1,12 @@
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import React from 'react';
 
-export default function Home() {
+const HomePage: React.FC = () => {
   return (
-    <>
-   <div className="flex flex-col items-center justify-center">
-    <header className="text-center">
-      <h1 className="text-4xl font-bold">Spider Craft</h1>
-      
-    </header>
+    <div>
+      <h1>Welcome to Polaris 2025</h1>
+      <p>testing..</p>
     </div>
-    <div className="flex flex-col items-center justify-center mt-5">
-    <Link href="/round-1">
-        <Button className="bg-primary text-primary-foreground rounded-lg p-4 hover:invert">Round 1 </Button>
-      </Link>
-    </div>
-    
-    </>
-
-
   );
-}
+};
+
+export default HomePage;

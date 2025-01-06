@@ -1,0 +1,21 @@
+{
+  "name": "Spider-man: Miles Morales",
+  "short_name": "Spider-man",
+  "icons": [
+    {
+      "src": "/img/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/img/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "background_color": "#0A0C10",
+  "description": "Spider-man: Miles Morales | PS5",
+  "display": "fullscreen",
+  "start_url": "/",
+  "theme_color": "#0A0C10"
+}
