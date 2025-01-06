@@ -9,14 +9,21 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@next/font": "^13.1.2",
+    "@styled-icons/bootstrap": "^10.47.0",
+    "@styled-icons/boxicons-logos": "^10.47.0",
     "@radix-ui/react-progress": "^1.1.1",
     "@radix-ui/react-slot": "^1.1.1",
+    "sharp": "^0.31.3",
+    "styled-media-query": "^2.1.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.469.0",
     "next": "14.2.18",
     "react": "^18",
-    "react-dom": "^18",
+    "react-dom": "^18.3.1",
+    "react-parallax-tilt": "^1.7.270",
+    "styled-components": "^6.1.14",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7"
   },
