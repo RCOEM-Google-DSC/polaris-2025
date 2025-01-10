@@ -62,26 +62,11 @@ export default function Home() {
     }
   };
 
-  const handleShowLeaderboard = () => {
-    // TODO: Implement leaderboard functionality
-    console.log('Show leaderboard');
-  };
-
-  const handleNextRound = () => {
-    setCurrentQuestion(0);
-    setScore(0);
-    setTimeLeft(QUESTION_TIME);
-    setIsAnswered(false);
-    setQuizComplete(false);
-    setSelectedOption(null);
-  };
-
   if (quizComplete) {
     return (
       <QuizComplete
+        nextRound={'/spidey-sense'}
         score={score}
-        onShowLeaderboard={handleShowLeaderboard}
-        onNextRound={handleNextRound}
       />
     );
   }
