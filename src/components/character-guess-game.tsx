@@ -6,6 +6,8 @@ import { Input } from "../components/ui/input"
 import { Progress } from "../components/ui/progress"
 import { TOTAL_TIME, INITIAL_POINTS, HINT_COSTS, BLUR_LEVEL, getRandomCharacters, COLORS, BLUR_HEIGHT, BLUR_WIDTH } from '../utils/gameUtils'
 import { Star, Clock, Zap, Lightbulb } from 'lucide-react';
+import { QuizComplete } from './QuizComplete';
+import { redirect } from 'next/navigation';
 
 export default function CharacterGuessGame() {
   const [points, setPoints] = useState(INITIAL_POINTS);
@@ -127,18 +129,10 @@ export default function CharacterGuessGame() {
 
   if (gameOver) {
     return (
-      <div className={`flex flex-col items-center justify-center min-h-[100svh] ${COLORS.background} text-gray-200`}>
-        <div className="bg-gray-800 p-8 rounded-lg shadow-lg text-center">
-          <h1 className="text-4xl font-bold mb-4">Game Over!</h1>
-          <p className="text-2xl mb-8">Final Score: {points}</p>
-          <Button 
-            onClick={() => window.location.reload()}
-            className={`bg-primary hover:bg-secondary text-white text-lg px-6 py-3`}
-          >
-            Play Again
-          </Button>
-        </div>
-      </div>
+      <QuizComplete
+        nextRound='/'
+        score={points}
+      />
     );
   }
 

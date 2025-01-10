@@ -5,7 +5,7 @@ export const BLUR_LEVEL = 200; // Initial blur level
 export const BLUR_HEIGHT=Math.random() * 40 + 100
 export const BLUR_WIDTH=Math.random() * 40 + 100
 export const characters = [
-  { name: "IronMan", image: "./ironman.jpeg" },
+  { name: "IronMan", image: "img/ironman.jpeg" },
 ];
 
 export function getRandomCharacters(n: number) {

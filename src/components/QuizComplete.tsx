@@ -8,11 +8,10 @@ import Link from 'next/link';
 
 interface QuizCompleteProps {
   score: number;
-  onShowLeaderboard: () => void;
-  onNextRound: () => void;
+  nextRound : string
 }
 
-export function QuizComplete({ score, onShowLeaderboard, onNextRound }: QuizCompleteProps) {
+export function QuizComplete({ score,nextRound}: QuizCompleteProps) {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
@@ -26,16 +25,17 @@ export function QuizComplete({ score, onShowLeaderboard, onNextRound }: QuizComp
             <p className="text-muted-foreground">Total Points</p>
           </div>
           <div className="grid gap-4">
+            <Link href={'/leaderboard'}>
             <Button 
               className="w-full" 
-              onClick={onShowLeaderboard}
               variant="outline"
             >
               <Award className="mr-2 h-4 w-4" />
               Reveal Leaderboard
             </Button>
-            <Link href="/spidey-sense">
-            <Button className="w-full" onClick={onNextRound}>
+            </Link>
+            <Link href={nextRound}>
+            <Button className="w-full">
               Next Round
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
