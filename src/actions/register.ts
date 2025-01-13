@@ -12,16 +12,14 @@ export const signup = async (values:z.infer<typeof RegisterSchema>)=>{
     const validated = RegisterSchema.safeParse(values)
     if(!validated.success) return{error : validated.error.message}
     const {email ,password,name} = validated.data
-    const {account,db,users} = await createAdminClient()
+    const {account,db} = await createAdminClient()
     try {
         const user = await account.create(ID.unique(),email,password,name)
-        // const  label = await users.updateLabels(user.$id , ["ORGANISER"])
          console.log(user);
         const udocument = await db.createDocument(process.env.NEXT_APPWRITE_DB! , process.env.NEXT_APPWRITE_USERS!,user.$id,{
             "name" : user.name,
             "email":email,
             "id" : user.$id,
-            // "role" : label.labels[0],
             "createdAt" : user.$createdAt
         },
         [

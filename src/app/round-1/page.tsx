@@ -6,24 +6,32 @@ import { QuizCard } from '../../components/QuizCard';
 import { QuizTimer } from '../../components/QuizTimer';
 import { QuizComplete } from '../../components/QuizComplete';
 import { Button } from "../../components/ui/button";
+import { getLoggedInUser } from '@/appwrite/config';
+import { useRouter } from 'next/navigation';
 
 const QUESTION_TIME = 300; // seconds per question
 const MAX_POINTS = 100; // maximum points per question
 
 export default function Home() {
+  const router = useRouter()
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(QUESTION_TIME);
   const [isAnswered, setIsAnswered] = useState(false);
   const [quizComplete, setQuizComplete] = useState(false);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  
+  useEffect(()=>{
+    getLoggedInUser().then(user=>{
+      if(!user) router.push("/login")
+    })
+  },[])
 
   useEffect(() => {
     if (!quizComplete && !isAnswered && timeLeft > 0) {
       const timer = setInterval(() => {
         setTimeLeft((prev) => prev - 1);
       }, 1000);
-
       return () => clearInterval(timer);
     }
   }, [timeLeft, isAnswered, quizComplete]);

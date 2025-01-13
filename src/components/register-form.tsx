@@ -30,12 +30,12 @@ export const RegisterForm = () =>{
         })
     }
     return(
-        <div className="py-3 w-[90%] md:w-auto flex flex-col gap-y-2 justify-center items-center bg-neutral-900 border border-white/50 rounded-md">
+        <div className="py-1 px-6 w-[90%] md:w-auto flex flex-col gap-y-5 justify-center items-center bg-neutral-900 border border-white/50 rounded-md">
             <h1 className="text-white font-semibold tracking-wider">Sign Up</h1>
             <form onSubmit={handleSubmit(onsubmit)} className="h-[80%] px-5 flex flex-col gap-y-4 justify-center items-center">
             <div className="flex flex-col gap-y-2">
-                <p className="text-white/90  tracking-wide">Name:</p>
-                <input {...register('name')} placeholder="username" disabled={isPending} className="outline-none disabled:bg-neutral-800 text-white/90 bg-white/10 rounded px-3 py-2"/>
+                <p className="text-white/90  tracking-wide">Team name:</p>
+                <input {...register('name')} placeholder="Team name" disabled={isPending} className="outline-none disabled:bg-neutral-800 text-white/90 bg-white/10 rounded px-3 py-2"/>
                 {errors.name?.message && <FieldError message={errors.name.message} />}
                 </div>
                 <div className="flex flex-col gap-y-2">

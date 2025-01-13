@@ -7,9 +7,11 @@ import { Progress } from "../components/ui/progress"
 import { TOTAL_TIME, INITIAL_POINTS, HINT_COSTS, BLUR_LEVEL, getRandomCharacters, COLORS, BLUR_HEIGHT, BLUR_WIDTH } from '../utils/gameUtils'
 import { Star, Clock, Zap, Lightbulb } from 'lucide-react';
 import { QuizComplete } from './QuizComplete';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import { getLoggedInUser } from '@/appwrite/config';
 
 export default function CharacterGuessGame() {
+  const router = useRouter()
   const [points, setPoints] = useState(INITIAL_POINTS);
   const [characters, setCharacters] = useState(getRandomCharacters(5));
   const [currentCharacterIndex, setCurrentCharacterIndex] = useState(0);
@@ -21,7 +23,12 @@ export default function CharacterGuessGame() {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const currentCharacter = characters[currentCharacterIndex];
-  
+    
+  useEffect(()=>{
+      getLoggedInUser().then(user=>{
+        if(!user) router.push("/login")
+      })
+    },[])  
   const handleNextCharacter = useCallback(() => {
     if (currentCharacterIndex < characters.length - 1) {
       setCurrentCharacterIndex((prevIndex) => prevIndex + 1);
