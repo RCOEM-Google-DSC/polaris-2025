@@ -9,15 +9,16 @@ import { getLoggedInUser } from '@/appwrite/config';
 import { useRouter } from 'next/navigation';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { getQuiz, updateUser } from '@/actions/quiz';
+import { getQuiz, updateUser, validate } from '@/actions/quiz';
 
-const QUESTION_TIME = 60; // seconds per question
-const MAX_POINTS = 100; // maximum points per question
+const QUESTION_TIME = 60;
+const MAX_POINTS = 100;
 
 export interface Question{
+  id:string;
   text:string;
   options:string[];
-  correct:string;
+  // correct:string;
   isAnswered:boolean;
   isCorrect: boolean;
 }
@@ -67,28 +68,32 @@ export default function Home() {
   };
 
   const handleSubmitAnswer = () => {
+
     if (selectedOption) {
       setIsAnswered(true);
       setScore((prev) => prev + calculatePoints(timeLeft));
-      if (selectedOption === questions[currentQuestion].correct) {
-        setQuestions(prev=>{
-          const quiz = prev.map((q,i)=> i==currentQuestion ? {text:questions[currentQuestion].text,correct : questions[currentQuestion].correct
-            , options : questions[currentQuestion].options,isCorrect:true,isAnswered:true } : q )
-          return quiz
-        })
-        updateUser(id!,{
-          "round_1" : score+calculatePoints(timeLeft),
-          "quiz": questions
-        })
-        toast.success("Correct Answer")
-      }else{
-        questions[currentQuestion].isAnswered = true
-        updateUser(id!,{
-          "round_1" : score,
-          "quiz": questions
-        })
-        toast.error("Incorrect Answer. Correct answer is "+questions[currentQuestion].correct)
-      }
+      validate(questions[currentQuestion].id,selectedOption).then(data=>{
+        if(data.error){
+          return alert("Error")
+        }
+        if(data.correct){
+          setQuestions(prev=>{
+            const quiz = prev.map((q,i)=> i==currentQuestion ? {text:questions[currentQuestion].text
+              , options : questions[currentQuestion].options,isCorrect:true,isAnswered:true,id: questions[currentQuestion].id} : q )
+            return quiz
+          })
+          updateUser(questions[currentQuestion].id,{isAnswered:true,isCorrect:true},id!,score)
+          toast.success("Correct Answer")
+        }else{
+          setQuestions(prev=>{
+            const quiz = prev.map((q,i)=> i==currentQuestion ? {text:questions[currentQuestion].text
+              , options : questions[currentQuestion].options,isCorrect:false,isAnswered:true,id: questions[currentQuestion].id} : q )
+            return quiz
+          })
+          updateUser(questions[currentQuestion].id,{isAnswered:true,isCorrect:false},id!,score)
+          toast.error("Incorrect Answer. Correct answer is "+data.message)
+        }
+      })
     }
   };
 

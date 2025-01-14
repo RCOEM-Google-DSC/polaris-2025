@@ -3,6 +3,23 @@
 import { createAdminClient, getLoggedInUser } from "@/appwrite/config"
 import { Query } from "node-appwrite";
 
+export const validate = async (id:string,selected:string) => {
+    try {
+        const {account,db} = await createAdminClient()
+        const quiz = await db.getDocument(
+            process.env.NEXT_APPWRITE_DB!,
+            process.env.NEXT_APPWRITE_QUIZ!,
+            id
+        )
+        if(quiz.correct==selected)return {correct:true,message:quiz.correct}
+        else return {correct:false,message:quiz.correct}
+    } catch (error) {
+        console.log(error)
+        return {
+            error:"error"
+        }
+    }
+}
 export const getQuiz = async () => {
     try {
     const {account,db} = await createAdminClient()
@@ -18,6 +35,7 @@ export const getQuiz = async () => {
     )
     const quiz = data.documents[0].quiz.map((q:any)=>{
         return {
+            id: q.$id,
             text : q.text,
             options : q.options,
             isAnswered : q.isAnswered,
@@ -34,15 +52,23 @@ export const getQuiz = async () => {
 }
 
 // @ts-ignore
-export const updateUser = async (id:string,data) => {
+export const updateUser = async (qid:string,data,uid:string,points:number) => {
     try {
         const {account,db} = await createAdminClient()
-        await db.updateDocument(
+        const quiz = await db.updateDocument(
+            process.env.NEXT_APPWRITE_DB!,
+            process.env.NEXT_APPWRITE_QUIZ!,
+            qid,
+            data
+        )  
+        const user = await db.updateDocument(
             process.env.NEXT_APPWRITE_DB!,
             process.env.NEXT_APPWRITE_USERS!,
-            id,
-            data
-        )   
+            uid,
+            {
+                round_1:points
+            }
+        ) 
         console.log("Success");
         return {"success":true}
     } catch (error) {
