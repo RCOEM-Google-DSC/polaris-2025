@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "./ui/button";
 import { Trophy, Award, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { ToastContainer } from 'react-toastify';
 
 interface QuizCompleteProps {
   score: number;
@@ -14,6 +15,7 @@ interface QuizCompleteProps {
 export function QuizComplete({ score,nextRound}: QuizCompleteProps) {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <ToastContainer/>
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <Trophy className="w-16 h-16 mx-auto mb-4 text-yellow-500" />

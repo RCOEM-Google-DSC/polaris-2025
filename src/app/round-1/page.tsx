@@ -8,8 +8,10 @@ import { QuizComplete } from '../../components/QuizComplete';
 import { Button } from "../../components/ui/button";
 import { getLoggedInUser } from '@/appwrite/config';
 import { useRouter } from 'next/navigation';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-const QUESTION_TIME = 300; // seconds per question
+const QUESTION_TIME = 60; // seconds per question
 const MAX_POINTS = 100; // maximum points per question
 
 export default function Home() {
@@ -20,7 +22,6 @@ export default function Home() {
   const [isAnswered, setIsAnswered] = useState(false);
   const [quizComplete, setQuizComplete] = useState(false);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
-  
   useEffect(()=>{
     getLoggedInUser().then(user=>{
       if(!user) router.push("/login")
@@ -55,6 +56,9 @@ export default function Home() {
       setIsAnswered(true);
       if (selectedOption === questions[currentQuestion].correctAnswer) {
         setScore((prev) => prev + calculatePoints(timeLeft));
+        toast.success("Correct Answer")
+      }else{
+        toast.error("Incorrect Answer. Correct answer is "+questions[currentQuestion].correctAnswer)
       }
     }
   };
@@ -81,6 +85,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center p-4 space-y-6">
+      <ToastContainer />
       <div className="w-full max-w-2xl space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold">College Quiz Event</h1>

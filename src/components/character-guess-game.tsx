@@ -9,6 +9,8 @@ import { Star, Clock, Zap, Lightbulb } from 'lucide-react';
 import { QuizComplete } from './QuizComplete';
 import { useRouter } from 'next/navigation';
 import { getLoggedInUser } from '@/appwrite/config';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function CharacterGuessGame() {
   const router = useRouter()
@@ -46,11 +48,11 @@ export default function CharacterGuessGame() {
       return
     }
     if (guess.toLowerCase() === currentCharacter.name.toLowerCase()) {
-      alert("Correct")
       setPoints((prevPoints) => prevPoints + 20);
+      toast.success("Correct Guess")
     } else {
       setPoints((prevPoints) => Math.max(0, prevPoints - 5));
-      alert("Wrong answer. Character is "+currentCharacter.name)
+      toast.error("Wrong answer. Character is "+currentCharacter.name)
     }
     setGuess('');
     handleNextCharacter();
@@ -117,7 +119,7 @@ export default function CharacterGuessGame() {
     deblurredAreas.forEach(area => {
       ctx.save();
       ctx.beginPath();
-  
+      ctx.filter = `blur(${10}px)`;
       // Define the deblurred area
       ctx.arc(area.x, area.y, area.radius, 0, Math.PI * 5);
       ctx.clip();
@@ -145,9 +147,9 @@ export default function CharacterGuessGame() {
 
   return (
     <div className={`flex flex-col items-center justify-center min-h-[100svh] ${COLORS.background} text-gray-200 p-4`}>
+      <ToastContainer/>
       <div className="w-full max-w-4xl">
         <h1 className="text-4xl font-bold mb-6 text-center">Guess the Character!</h1>
-        
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div className={`flex items-center justify-center p-4 rounded-lg bg-secondary`}>
             <Star className="w-6 h-6 mr-2" />
