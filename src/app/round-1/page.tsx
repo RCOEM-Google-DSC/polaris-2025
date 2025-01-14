@@ -113,9 +113,17 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center p-4 space-y-6">
+    <div
+      style={{
+        backgroundImage: "url('/img/Earth 65 - spiderverse 1.jpg')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+      className="min-h-screen flex flex-col items-center p-4 space-y-6"
+    >
       <ToastContainer />
-      <div className="w-full max-w-2xl space-y-6">
+      <div className="w-full max-w-2xl space-y-6 bg-opacity-80 p-6 rounded-lg shadow-lg">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold">College Quiz Event</h1>
           <div className="text-right">
@@ -123,22 +131,22 @@ export default function Home() {
             <p className="font-bold">Score: {score}</p>
           </div>
         </div>
-        
-        <QuizTimer timeLeft={timeLeft} maxTime={QUESTION_TIME}/>
-        
-        {questions.length && currentQuestion<questions.length? <QuizCard
+
+        <QuizTimer timeLeft={timeLeft} maxTime={QUESTION_TIME} />
+
+        {questions.length && currentQuestion < questions.length ? <QuizCard
           question={questions[currentQuestion]}
           selectedOption={selectedOption}
           onSelect={handleOptionSelect}
         /> : "Not found"
         }
-        {questions.length && currentQuestion<questions.length && !questions[currentQuestion].isAnswered && selectedOption && (
+        {questions.length && currentQuestion < questions.length && !questions[currentQuestion].isAnswered && selectedOption && (
           <Button className="w-full" onClick={handleSubmitAnswer}>
             Submit Answer
           </Button>
         )}
-        
-        {questions.length && currentQuestion<questions.length && questions[currentQuestion].isAnswered && (
+
+        {questions.length && currentQuestion < questions.length && questions[currentQuestion].isAnswered && (
           <Button className="w-full" onClick={handleNextQuestion}>
             {currentQuestion < questions.length - 1 ? "Next Question" : "Finish Quiz"}
           </Button>
@@ -147,3 +155,4 @@ export default function Home() {
     </div>
   );
 }
+
