@@ -40,7 +40,6 @@ export const getQuiz = async () => {
             options : q.options,
             isAnswered : q.isAnswered,
             isCorrect: q.isCorrect,
-            correct: q.correct
         }
     })
     console.log(quiz);
