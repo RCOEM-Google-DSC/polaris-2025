@@ -7,6 +7,7 @@ import { cookies } from "next/headers"
 import { z } from "zod"
 import { redirect } from "next/navigation";
 import { Permission, Role } from "node-appwrite"
+import { questions } from "@/lib/questions"
 
 export const signup = async (values:z.infer<typeof RegisterSchema>)=>{
     const validated = RegisterSchema.safeParse(values)
@@ -20,6 +21,7 @@ export const signup = async (values:z.infer<typeof RegisterSchema>)=>{
             "name" : user.name,
             "email":email,
             "id" : user.$id,
+            "quiz" : questions,
             "createdAt" : user.$createdAt
         },
         [

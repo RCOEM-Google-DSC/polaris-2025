@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { questions } from '../../lib/questions';
 import { QuizCard } from '../../components/QuizCard';
 import { QuizTimer } from '../../components/QuizTimer';
 import { QuizComplete } from '../../components/QuizComplete';
@@ -10,9 +9,18 @@ import { getLoggedInUser } from '@/appwrite/config';
 import { useRouter } from 'next/navigation';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { getQuiz, updateUser } from '@/actions/quiz';
 
 const QUESTION_TIME = 60; // seconds per question
 const MAX_POINTS = 100; // maximum points per question
+
+export interface Question{
+  text:string;
+  options:string[];
+  correct:string;
+  isAnswered:boolean;
+  isCorrect: boolean;
+}
 
 export default function Home() {
   const router = useRouter()
@@ -22,9 +30,16 @@ export default function Home() {
   const [isAnswered, setIsAnswered] = useState(false);
   const [quizComplete, setQuizComplete] = useState(false);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [questions,setQuestions] = useState<Question[]>([])
+  const [id,setId] = useState<string>()
   useEffect(()=>{
     getLoggedInUser().then(user=>{
       if(!user) router.push("/login")
+      setId(user?.$id)
+    })
+    getQuiz().then(data=>{
+      if(data) setQuestions(data!)
+        else alert("Something went wrong")
     })
   },[])
 
@@ -54,11 +69,25 @@ export default function Home() {
   const handleSubmitAnswer = () => {
     if (selectedOption) {
       setIsAnswered(true);
-      if (selectedOption === questions[currentQuestion].correctAnswer) {
-        setScore((prev) => prev + calculatePoints(timeLeft));
+      setScore((prev) => prev + calculatePoints(timeLeft));
+      if (selectedOption === questions[currentQuestion].correct) {
+        setQuestions(prev=>{
+          const quiz = prev.map((q,i)=> i==currentQuestion ? {text:questions[currentQuestion].text,correct : questions[currentQuestion].correct
+            , options : questions[currentQuestion].options,isCorrect:true,isAnswered:true } : q )
+          return quiz
+        })
+        updateUser(id!,{
+          "round_1" : score+calculatePoints(timeLeft),
+          "quiz": questions
+        })
         toast.success("Correct Answer")
       }else{
-        toast.error("Incorrect Answer. Correct answer is "+questions[currentQuestion].correctAnswer)
+        questions[currentQuestion].isAnswered = true
+        updateUser(id!,{
+          "round_1" : score,
+          "quiz": questions
+        })
+        toast.error("Incorrect Answer. Correct answer is "+questions[currentQuestion].correct)
       }
     }
   };
@@ -77,7 +106,7 @@ export default function Home() {
   if (quizComplete) {
     return (
       <QuizComplete
-        nextRound={'/spidey-sense'}
+        nextRound={'/round-2'}
         score={score}
       />
     );
@@ -90,27 +119,26 @@ export default function Home() {
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold">College Quiz Event</h1>
           <div className="text-right">
-            <p className="text-sm text-muted-foreground">Question {currentQuestion + 1}/10</p>
+            <p className="text-sm text-muted-foreground">Question {currentQuestion + 1}/{questions.length}</p>
             <p className="font-bold">Score: {score}</p>
           </div>
         </div>
         
         <QuizTimer timeLeft={timeLeft} maxTime={QUESTION_TIME}/>
         
-        <QuizCard
+        {questions.length && currentQuestion<questions.length? <QuizCard
           question={questions[currentQuestion]}
           selectedOption={selectedOption}
           onSelect={handleOptionSelect}
-          isAnswered={isAnswered}
-        />
-        
-        {!isAnswered && selectedOption && (
+        /> : "Not found"
+        }
+        {questions.length && currentQuestion<questions.length && !questions[currentQuestion].isAnswered && selectedOption && (
           <Button className="w-full" onClick={handleSubmitAnswer}>
             Submit Answer
           </Button>
         )}
         
-        {isAnswered && (
+        {questions.length && currentQuestion<questions.length && questions[currentQuestion].isAnswered && (
           <Button className="w-full" onClick={handleNextQuestion}>
             {currentQuestion < questions.length - 1 ? "Next Question" : "Finish Quiz"}
           </Button>
