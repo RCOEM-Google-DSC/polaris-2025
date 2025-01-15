@@ -9,11 +9,14 @@ export async function updateUserScore(userId: string, score: number) {
     const result = await db.listDocuments(process.env.NEXT_PUBLIC_APPWRITE_DB!, process.env.NEXT_PUBLIC_APPWRITE_USERS!, [
       Query.equal('id', userId)
     ]);     
+    console.log(result);
 
     if (result.documents.length > 0) {
-      await db.updateDocument(process.env.NEXT_PUBLIC_APPWRITE_DB!, process.env.NEXT_PUBLIC_APPWRITE_USERS!,result.documents[0].$id, {
+      const user = await db.updateDocument(process.env.NEXT_PUBLIC_APPWRITE_DB!, process.env.NEXT_PUBLIC_APPWRITE_USERS!,result.documents[0].$id, {
         round_3: score
+        
       });
+      console.log(user);
       return { success: true };
     } else {
       return { success: false, error: 'User not found' };

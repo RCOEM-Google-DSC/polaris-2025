@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Countdown from 'react-countdown'
 import { updateUserScore } from '@/actions/round-3'
+import { getLoggedInUser } from '@/appwrite/config'
+import { set } from 'date-fns'
 
 export default function RoundThree() {
   const [startTime, setStartTime] = useState<number | null>(null)
@@ -23,9 +25,13 @@ export default function RoundThree() {
         setStartTime(now)
         localStorage.setItem('roundThreeStartTime', now.toString())
         // In a real application, you'd get the user ID from your auth system
-        const newUserId = 'user-' + Math.random().toString(36).substr(2, 9)
-        setUserId(newUserId)
-        localStorage.setItem('userId', newUserId)
+        getLoggedInUser().then((user)=>{
+          if (!user) return
+          setUserId(user.$id)
+          localStorage.setItem('userId', user.$id)
+        })
+        // setUserId(newUserId)
+      
       }
     }
 
@@ -34,9 +40,16 @@ export default function RoundThree() {
 
   const fetchLeaderboard = async () => {
     try {
-      const response = await fetch(`https://www.hackerrank.com/rest/contests/spidercraft-test/leaderboard?offset=0&limit=10&_=${Date.now()}`)
+      const response = await fetch(`https://www.hackerrank.com/rest/contests/spidercraft-test/leaderboard?offset=0&limit=10&_=${Date.now()}`,
+      // {
+      //   method: 'GET',
+      //   headers: {
+      //     'Access-Control-Allow-Origin': '*',
+      //   }
+      // }
+    )
       const data = await response.json()
-      const currentUserScore = data.models.find((model: any) => model.hacker === 'CURRENT_USER_HANDLE')?.score || 0
+      const currentUserScore = data.models.find((model: any) => model.hacker === 'singhaditya4')?.score || 5
       setScore(currentUserScore)
       if (userId) {
         await updateUserScore(userId, currentUserScore)
@@ -75,7 +88,7 @@ export default function RoundThree() {
           renderer={renderer}
           onComplete={handleComplete}
           onTick={() => {
-            if (Date.now() - startTime! >= 5 * 60 * 1000) {
+            if (Date.now() - startTime! >= 1 * 60 * 1000) {
               fetchLeaderboard()
             }
           }}
