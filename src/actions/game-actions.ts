@@ -5,9 +5,14 @@ import { Query } from "node-appwrite";
 import { v4 as uuidv4 } from 'uuid';
 
 const characters = [
-  { name: "IronMan", image: "img/ironman.jpeg" },
-  { name: "dd", image: "img/ironman.jpeg" },
-  { name: "ddd", image: "img/ironman.jpeg" },
+  { name: "Vemon", image: "img/venom.jpg" },
+  { name: "Mysterio", image: "img/img2.jpeg" },
+  { name: "goblin", image: "img/img3.jpeg" },
+  { name: "sandman", image: "img/img4.jpeg" },
+  { name: "sandman", image: "img/img4.jpeg" },
+  { name: "sandman", image: "img/img4.jpeg" },
+  { name: "sandman", image: "img/img4.jpeg" },
+  { name: "sandman", image: "img/img4.jpeg" },
 ];
 
 type DeblurredArea = {

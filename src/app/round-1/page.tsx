@@ -23,6 +23,7 @@ export interface Question{
   isCorrect: boolean;
 }
 
+
 export default function Home() {
   const router = useRouter()
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -46,6 +47,20 @@ export default function Home() {
         else alert("Something went wrong")
     })
   },[])
+  const imageArray = [
+    // Array of image paths
+    
+         '/img/processed_image.png',
+         '/img/miles.png',
+         '/img/blackspider.png',
+    ];
+
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+    // Function to change the image
+  const changeImage = () => {
+    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % imageArray.length);
+  };
 
   useEffect(() => {
     if (!quizComplete && !isAnswered && timeLeft > 0) {
@@ -119,8 +134,11 @@ export default function Home() {
       />
     );
   }
+  
 
   return (
+    <>
+    <div style={{width: 719.72, height: 92, left: 360, top: 60, position: 'absolute',backgroundImage: "url('/img/Group 513272.png')"}} className=''></div>
     <div
       style={{
         backgroundImage: "url('/img/Earth 65 - spiderverse 1.jpg')",
@@ -128,10 +146,12 @@ export default function Home() {
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
       }}
-      className="min-h-screen flex flex-col items-center p-4 space-y-6"
+      className="min-h-screen flex  items-left p-4 space-y-6 gap-2 md:bg-cover"
     >
-      <ToastContainer />
-      <div className="w-full max-w-2xl space-y-6 bg-opacity-80 p-6 rounded-lg shadow-lg">
+     
+      
+      
+      <div style={{width: '100%', height: '100%', background: 'rgba(138.54, 138.54, 138.54, 0.20)', borderRadius: 15}} className=" w-full max-w-2xl space-y-6 m-7 mt-48 lg:ml-28 bg-opacity-80 p-5 rounded-lg shadow-lg">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold">College Quiz Event</h1>
           <div className="text-right">
@@ -146,24 +166,39 @@ export default function Home() {
           question={questions[currentQuestion]}
           selectedOption={selectedOption}
           onSelect={handleOptionSelect}
-        /> : <QuizComplete
-        nextRound={'/round-2'}
-        score={score}
-      />
+        /> : "Not found"
         }
+        
         {questions.length && currentQuestion < questions.length && !questions[currentQuestion].isAnswered && selectedOption && (
           <Button className="w-full" onClick={handleSubmitAnswer}>
             Submit Answer
           </Button>
         )}
+       
 
         {questions.length && currentQuestion < questions.length && questions[currentQuestion].isAnswered && (
-          <Button className="w-full" onClick={handleNextQuestion}>
+          <Button className="w-full" onClick={() => {handleNextQuestion(); changeImage()}} >
             {currentQuestion < questions.length - 1 ? "Next Question" : "Finish Quiz"}
           </Button>
         )}
       </div>
+      
+    <div 
+        style={{
+          position: 'fixed',
+          bottom: 0,
+          right: 0,
+          width: '750px',
+          height: '750px',
+          backgroundImage: `url(${imageArray[currentImageIndex]})`,
+          backgroundSize: 'contain',
+          backgroundPosition: 'bottom right',
+          backgroundRepeat: 'no-repeat',
+          zIndex: 10
+        }}
+        aria-hidden="true"
+      />
     </div>
+</>
   );
 }
-
