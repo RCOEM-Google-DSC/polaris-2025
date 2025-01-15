@@ -29,7 +29,7 @@ const sections: Record<string, SectionContent> = {
     backgroundImage: "/svg/bg1.svg",
   },
   aptitude: {
-    title: "APTITUDE ROUND",
+    title: "Web of Knowledge",
     description: "Test your problem-solving skills with a series of aptitude questions.",
     image: "/svg/aptitude.svg",
     background: "",
@@ -37,7 +37,7 @@ const sections: Record<string, SectionContent> = {
     backgroundImage: "/svg/bg1.svg",
   },
   imageGuesser: {
-    title: "IMAGE GUESSER",
+    title: "Spidey Sense",
     description: "Put your visual recognition skills to the test with our image guessing challenge.",
     image: "/svg/imageguesser.svg",
     background: "",
@@ -45,7 +45,7 @@ const sections: Record<string, SectionContent> = {
     backgroundImage: "/svg/bg1.svg",
   },
   quizRound: {
-    title: "QUIZ ROUND",
+    title: "AlgoWeb",
     description: "Challenge your knowledge with our comprehensive quiz covering various topics.",
     image: "/svg/quizround.svg",
     background: "",
@@ -53,7 +53,7 @@ const sections: Record<string, SectionContent> = {
     backgroundImage: "/svg/bg1.svg",
   },
   flappySpider: {
-    title: "FLAPPY SPIDER-MAN",
+    title: "Spiderman: City Chase",
     description: "Test your gaming skills with our Spider-Man themed endless runner game.",
     image: "/svg/flappyspidey.svg",
     background: "",
