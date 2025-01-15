@@ -77,3 +77,20 @@ export const updateUser = async (qid:string,data,uid:string,points:number) => {
   
 }
 
+export const updateQuiz = async (qid:string,data:any) => {
+    try {
+        const {account,db} = await createAdminClient()
+        const quiz = await db.updateDocument(
+            process.env.NEXT_APPWRITE_DB!,
+            process.env.NEXT_APPWRITE_QUIZ!,
+            qid,
+            data
+        )  
+        console.log("Success");
+        return {"success":true}
+    } catch (error) {
+        console.log(error)
+        return {"success":false}
+    }
+  
+}

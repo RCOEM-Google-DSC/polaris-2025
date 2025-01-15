@@ -9,7 +9,7 @@ import { getLoggedInUser } from "@/appwrite/config";
 import { useRouter } from "next/navigation";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { getQuiz, updateUser, validate } from "@/actions/quiz";
+import { getQuiz, updateQuiz, updateUser, validate } from "@/actions/quiz";
 
 const QUESTION_TIME = 60;
 const MAX_POINTS = 100;
@@ -86,12 +86,12 @@ export default function Home() {
   const handleSubmitAnswer = () => {
     if (selectedOption) {
       setIsAnswered(true);
-      setScore((prev) => prev + calculatePoints(timeLeft));
       validate(questions[currentQuestion].id, selectedOption).then((data) => {
         if (data.error) {
           return alert("Error");
         }
         if (data.correct) {
+          setScore((prev) => prev + calculatePoints(timeLeft));
           updateUser(
             questions[currentQuestion].id,
             { isAnswered: true, isCorrect: true },
@@ -114,6 +114,7 @@ export default function Home() {
           });
           toast.success("Correct Answer");
         } else {
+          setScore((prev) =>prev<5 ? 0 : prev - 5);
           updateUser(
             questions[currentQuestion].id,
             { isAnswered: true, isCorrect: false },
@@ -141,6 +142,12 @@ export default function Home() {
   };
 
   const handleNextQuestion = () => {
+    if(currentQuestion==questions.length-1){
+    updateQuiz(
+        questions[currentQuestion].id,
+        { isAnswered: true},
+      ).then(data=>data);
+    }
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion((prev) => prev + 1);
       setTimeLeft(QUESTION_TIME);
@@ -199,6 +206,7 @@ export default function Home() {
               </p>
               <p className="font-bold">Score: {score}</p>
             </div>
+            <ToastContainer/>
           </div>
 
           <QuizTimer
