@@ -7,11 +7,7 @@ import Link from "next/link";
 import { Models } from "node-appwrite";
 import { useEffect, useState } from "react";
 import Navbar from "../components/navbar/page";
-
 import Footer from "@/components/folder/page";
-
-// Import Morgant font
-
 
 interface SectionContent {
   title: string;
@@ -74,80 +70,98 @@ const HomePage = () => {
     getLoggedInUser().then((user) => setUser(user));
   }, []);
 
-  const renderAuthButtons = () => {
-    if (activeSection !== "spidercraft") return null;
+  const renderLogoutButton = () => {
+    if (activeSection !== "spidercraft" || !user) return null;
 
     return (
       <div className="absolute top-4 right-4 z-10">
-        {user ? (
-          <Button
-            onClick={async () => await logout()}
-            className="bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700 font-morgant"
-          >
-            LOG OUT
+        <Button
+          onClick={async () => await logout()}
+          className="bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700 font-morgant"
+        >
+          LOG OUT
+        </Button>
+      </div>
+    );
+  };
+
+  const renderActionButtons = () => {
+    if (activeSection !== "spidercraft") return null;
+
+    if (user) {
+      return (
+        <div className="space-x-4">
+          <Link href="/round-1">
+            <Button className="bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700 font-morgant">
+              Proceed To Rounds
+            </Button>
+          </Link>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-x-4">
+        <Link href="/register">
+          <Button className="bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700 font-morgant">
+            REGISTER
           </Button>
-        ) : (
-          <div className="space-x-4">
-            <Link href="/register">
-              <Button className="bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700 font-morgant">
-                REGISTER
-              </Button>
-            </Link>
-            <Link href="/login">
-              <Button variant="outline" className="border-white/20 hover:bg-white/10 font-morgant">
-                SIGN IN
-              </Button>
-            </Link>
-          </div>
-        )}
+        </Link>
+        <Link href="/login">
+          <Button variant="outline" className="border-white/20 hover:bg-white/10 font-morgant">
+            SIGN IN
+          </Button>
+        </Link>
       </div>
     );
   };
 
   return (
     <>
-      <div className={`min-h-screen bg-black text-white flex flex-col `}>
+      <div className="min-h-screen bg-black text-white flex flex-col">
         <Navbar />
-        <div className="flex-1 grid grid-cols-[350px_1fr] overflow-hidden">
+        <div className="flex-1 grid grid-cols-[350px_1fr]">
           {/* Left Sidebar */}
-          <div className="bg-gradient-to-b from-red-950 to-blue-950">
-            {Object.entries(sections).map(([key, section]) => (
-              <button
-                key={key}
-                onClick={() => setActiveSection(key)}
-                className="relative w-full h-32 overflow-hidden group border-b border-white/10"
-              >
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    backgroundImage: `url(${section.image})`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                    backgroundRepeat: "no-repeat",
-                    transform: "scale(1.02)",
-                  }}
-                />
-                <div
-                  className={`absolute inset-0 transition-all duration-300 ${
-                    activeSection === key
-                      ? "bg-gradient-to-r from-red-600/50 to-blue-600/50 border-l-4 border-white"
-                      : "bg-black/50 group-hover:bg-black/30"
-                  }`}
-                />
-                <h2 className="relative z-10 text-2xl font-bold tracking-wider p-2 mt-16 text-left text-white font-morgant">
-                  {section.title}
-                </h2>
-              </button>
-            ))}
+          <div className="">
+            <div className="flex flex-col h-[calc(99vh-82px)]"> {/* Adjusted height */}
+              {Object.entries(sections).map(([key, section]) => (
+                <button
+                  key={key}
+                  onClick={() => setActiveSection(key)}
+                  className="relative w-full h-32 overflow-hidden group border-b border-white/10"
+                >
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      backgroundImage: `url(${section.image})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                      backgroundRepeat: "no-repeat",
+                      transform: "scale(1.02)",
+                    }}
+                  />
+                  <div
+                    className={`absolute inset-0 transition-all duration-300 ${
+                      activeSection === key
+                        ? ""
+                        : "bg-black/50 group-hover:bg-black/30"
+                    }`}
+                  />
+                  <h2 className="relative z-10 text-2xl font-bold tracking-wider p-2 mt-16 text-left text-white font-morgant">
+                    {section.title}
+                  </h2>
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Main Content */}
           <div
-            className="relative transition-all duration-500 bg-cover bg-center h-screen size-auto"
+            className="relative transition-all duration-500 bg-cover bg-center h-[calc(100vh-64px)]" /* Adjusted height */
             style={{ backgroundImage: `url(${sections[activeSection].backgroundImage})` }}
           >
             <div className={`absolute inset-0 ${sections[activeSection].background}`}></div>
-            {renderAuthButtons()}
+            {renderLogoutButton()}
             <div className="relative h-screen p-16 -mt-48 flex items-center">
               <div className="flex-1 space-y-6 max-w-2xl">
                 <div className="space-y-2">
@@ -157,30 +171,23 @@ const HomePage = () => {
                   <div className="flex items-center space-x-1">
                     <div className="h-1 w-64 bg-red-600"></div>
                     <div className="h-1 w-64 bg-white"></div>
-            
                   </div>
                 </div>
                 <p className="text-xl text-gray-300 leading-relaxed font-morgant">
                   {sections[activeSection].description}
                 </p>
                 <div className="pt-8">
-                <div className="space-x-4">
-            <Link href="/round-1">
-              <Button className="bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700 font-morgant">
-                Proceed To Rounds
-              </Button>
-            </Link>
-          </div>
+                  {renderActionButtons()}
                 </div>
               </div>
             </div>
 
             {/* Character image */}
-            <div className="absolute right-0 -bottom-80 h-[1050px] w-[50">
+            <div className="absolute right-0 -bottom-80 h-[1000px] w-[50">
               <img
                 src={sections[activeSection].character || "/placeholder.svg"}
                 alt={sections[activeSection].title}
-                className="h-[650px] w-auto object-contain"
+                className="h-[680px] w-auto object-contain"
               />
             </div>
 

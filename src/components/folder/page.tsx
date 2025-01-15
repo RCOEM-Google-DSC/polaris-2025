@@ -10,14 +10,14 @@ interface FooterProps {
 }
 
 const Footer = ({ 
-  backgroundImage = '/bg-footer.jpg',  // Default background image
-  backgroundColor = 'bg-black/90'      // Default background color
+  backgroundImage = '/svg/footerbg.svg',  // Default background image
+  backgroundColor = ''      // Default background color
 }: FooterProps) => {
   return (
-    <footer className="relative text-white py-12"> {/* Increased padding */}
+    <footer className="relative text-white py-14"> {/* Increased padding */}
       {/* Background Image Container */}
       <div 
-        className="absolute inset-0 z-0" 
+        className="absolute inset-0 z-0 -opacity-50" 
         style={{
           backgroundImage: `url(${backgroundImage})`,
           backgroundSize: 'cover',
@@ -38,10 +38,10 @@ const Footer = ({
           </div>
 
           {/* Vertical Line */}
-          <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-[6px] bg-white/20 transform -translate-x-1/2"></div>
+          <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-[6px] bg-white transform -translate-x-1/2 -mx-16"></div>
 
           {/* Right side with contact info and social links */}
-          <div className="space-y-8"> {/* Increased spacing */}
+          <div className="space-y-8 mx-8"> {/* Increased spacing */}
             {/* Contact Information */}
             <div className="space-y-4"> {/* Increased spacing */}
               <div className="flex items-start gap-3 text-base"> {/* Increased text size and gap */}
@@ -53,7 +53,7 @@ const Footer = ({
               </div>
               <div className="flex items-center gap-3 text-base"> {/* Increased text size and gap */}
                 <Mail size={24} className="opacity-60" /> {/* Increased icon size */}
-                <Link href="mailto:dsc.rknec@gmail.com" className="hover:text-blue-400 transition-colors">
+                <Link href="mailto:dsc.rknec@gmail.com" className="hover:text-blue-400 transition-colors underline">
                   dsc.rknec@gmail.com
                 </Link>
               </div>
