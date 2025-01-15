@@ -1,102 +1,135 @@
 'use client'
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Button } from "../components//ui/button"
-import { Input } from "../components/ui/input"
-import { Progress } from "../components/ui/progress"
-import { TOTAL_TIME, INITIAL_POINTS, HINT_COSTS, BLUR_LEVEL, getRandomCharacters, COLORS, BLUR_HEIGHT, BLUR_WIDTH } from '../utils/gameUtils'
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Progress } from "@/components/ui/progress"
+import { TOTAL_TIME, INITIAL_POINTS, HINT_COSTS, BLUR_LEVEL, COLORS } from '@/utils/gameUtils'
 import { Star, Clock, Zap, Lightbulb } from 'lucide-react';
 import { QuizComplete } from './QuizComplete';
 import { useRouter } from 'next/navigation';
 import { getLoggedInUser } from '@/appwrite/config';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { startNewGame, validateGuess, getHint } from '@/actions/game-actions';
 
 export default function CharacterGuessGame() {
   const router = useRouter()
   const [points, setPoints] = useState(INITIAL_POINTS);
-  const [characters, setCharacters] = useState(getRandomCharacters(5));
-  const [currentCharacterIndex, setCurrentCharacterIndex] = useState(0);
+  const [currentCharacter, setCurrentCharacter] = useState<{ image: string } | undefined>(undefined);
   const [hintsUsed, setHintsUsed] = useState(0);
   const [timeLeft, setTimeLeft] = useState(TOTAL_TIME);
   const [guess, setGuess] = useState('');
   const [gameOver, setGameOver] = useState(false);
   const [deblurredAreas, setDeblurredAreas] = useState<{ x: number, y: number, radius: number }[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isGuessing, setIsGuessing] = useState(false);
+  const [isHinting, setIsHinting] = useState(false);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const currentCharacter = characters[currentCharacterIndex];
     
-  useEffect(()=>{
-      getLoggedInUser().then(user=>{
-        if(!user) router.push("/login")
-      })
-    },[])  
-  const handleNextCharacter = useCallback(() => {
-    if (currentCharacterIndex < characters.length - 1) {
-      setCurrentCharacterIndex((prevIndex) => prevIndex + 1);
-      setHintsUsed(0);
-      setDeblurredAreas([]);
-      setTimeLeft(TOTAL_TIME);
-    } else {
-      setGameOver(true);
-    }
-  }, [currentCharacterIndex, characters.length]);
+  useEffect(() => {
+    getLoggedInUser().then(user => {
+      if(!user) router.push("/login")
+      else initializeGame();
+    })
+  }, [])
 
-  const handleGuess = useCallback(() => {
-    if(!guess.toLowerCase()){
-      alert("Enter Something")
-      return
-    }
-    if (guess.toLowerCase() === currentCharacter.name.toLowerCase()) {
-      setPoints((prevPoints) => prevPoints + 20);
-      toast.success("Correct Guess")
-    } else {
-      setPoints((prevPoints) => Math.max(0, prevPoints - 5));
-      toast.error("Wrong answer. Character is "+currentCharacter.name)
-    }
-    setGuess('');
-    handleNextCharacter();
-  }, [guess, currentCharacter, handleNextCharacter]);
-
-  const handleHint = useCallback(() => {
-    if (hintsUsed < HINT_COSTS.length && points >= HINT_COSTS[hintsUsed]) {
-      setPoints((prevPoints) => prevPoints - HINT_COSTS[hintsUsed]);
-      setHintsUsed((prevHints) => prevHints + 1);
-      
-      const canvas = canvasRef.current;
-      if (canvas) {
-        const x = Math.random() * canvas.width;
-        const y = Math.random() * canvas.height;
-        
-        // Increase the radius for the deblurred area
-        const radius = Math.random() * 50 + 150; // Larger radius, range 150-200
-        setDeblurredAreas((prev) => [...prev, { x, y, radius }]);
+  const initializeGame = async () => {
+    setIsLoading(true);
+    try {
+      const result = await startNewGame();
+      if (result.gameOver) {
+        setGameOver(true);
+        setPoints(result.points!);
+      } else {
+        const { currentCharacter, deblurredAreas, hintsUsed, points } = result;
+        setCurrentCharacter(currentCharacter);
+        setDeblurredAreas(deblurredAreas!);
+        setHintsUsed(hintsUsed!);
+        setPoints(points!);
       }
+    } catch (error) {
+      console.error("Failed to start new game:", error);
+      toast.error("Failed to start new game. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
-  }, [hintsUsed, points]);
+  };
+
+  const handleGuess = useCallback(async () => {
+    if(!guess.toLowerCase()){
+      toast.error("Please enter a guess");
+      return;
+    }
+    
+    setIsGuessing(true);
+    try {
+      const result = await validateGuess(guess);
+      if (result.isCorrect) {
+        toast.success("Correct Guess!");
+      } else {
+        toast.error("Wrong answer. Try again!");
+      }
+
+      setPoints(result.points);
+      setGuess('');
+      setHintsUsed(0);
+      setDeblurredAreas(result.deblurredAreas || []);
+      setTimeLeft(TOTAL_TIME);
+
+      if (result.gameOver) {
+        setGameOver(true);
+      } else {
+        setCurrentCharacter(result.nextCharacter);
+      }
+    } catch (error) {
+      console.error("Error validating guess:", error);
+      toast.error("An error occurred. Please try again.");
+    } finally {
+      setIsGuessing(false);
+    }
+  }, [guess]);
+
+  const handleHint = useCallback(async () => {
+    setIsHinting(true);
+    try {
+      const result = await getHint();
+      setPoints(result.points);
+      setHintsUsed(result.hintsUsed);
+      setDeblurredAreas(result.deblurredAreas);
+    } catch (error) {
+      console.error("Error getting hint:", error);
+      toast.error("Unable to get hint. Try again later.");
+    } finally {
+      setIsHinting(false);
+    }
+  }, []);
   
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
-    if (timeLeft > 0 && !gameOver) {
+    if (timeLeft > 0 && !gameOver && !isLoading && !isGuessing && !isHinting) {
       timer = setInterval(() => {
         setTimeLeft((prevTime) => {
           if (prevTime <= 1) {
             clearInterval(timer);
-            handleNextCharacter();
-            return 0;
+            handleGuess();
+            return TOTAL_TIME;
           }
           return prevTime - 1;
         });
       }, 1000);
     }
     return () => clearInterval(timer);
-  }, [timeLeft, gameOver, handleNextCharacter]);
+  }, [timeLeft, gameOver, handleGuess, isLoading, isGuessing, isHinting]);
 
   useEffect(() => {
-    const img = new Image();
-    img.src = currentCharacter.image;
-    img.onload = () => drawImage(img);
+    if (currentCharacter) {
+      const img = new Image();
+      img.src = currentCharacter.image;
+      img.onload = () => drawImage(img);
+    }
   }, [currentCharacter, deblurredAreas]);
 
   const drawImage = (img: HTMLImageElement) => {
@@ -106,25 +139,20 @@ export default function CharacterGuessGame() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
   
-    // Set canvas dimensions to match the image
     canvas.width = img.width;
     canvas.height = img.height;
   
-    // Draw the fully blurred image
     ctx.filter = `blur(${BLUR_LEVEL}px)`;
     ctx.drawImage(img, 0, 0);
   
-    // Remove blur in the deblurred areas
     ctx.filter = 'none';
     deblurredAreas.forEach(area => {
       ctx.save();
       ctx.beginPath();
       ctx.filter = `blur(${10}px)`;
-      // Define the deblurred area
-      ctx.arc(area.x, area.y, area.radius, 0, Math.PI * 5);
+      ctx.arc(area.x * canvas.width / 100, area.y * canvas.height / 100, area.radius * canvas.width / 100, 0, Math.PI * 2);
       ctx.clip();
   
-      // Redraw the unblurred portion of the image
       ctx.drawImage(img, 0, 0);
       ctx.restore();
     });
@@ -135,6 +163,14 @@ export default function CharacterGuessGame() {
     e.preventDefault();
     handleGuess();
   };
+
+  if (isLoading) {
+    return (
+      <div className={`flex flex-col items-center justify-center min-h-[100svh] ${COLORS.background} text-gray-200 p-4`}>
+        <h1 className="text-4xl font-bold mb-6 text-center">Loading Game...</h1>
+      </div>
+    );
+  }
 
   if (gameOver) {
     return (
@@ -161,7 +197,7 @@ export default function CharacterGuessGame() {
           </div>
           <div className={`flex items-center justify-center p-4 rounded-lg bg-secondary`}>
             <Zap className="w-6 h-6 mr-2" />
-            <span className="text-xl font-semibold">Character: {currentCharacterIndex + 1}/5</span>
+            <span className="text-xl font-semibold">Hints Used: {hintsUsed}/3</span>
           </div>
         </div>
         
@@ -189,20 +225,21 @@ export default function CharacterGuessGame() {
               <Button 
                 type="submit"
                 className={`bg-primary hover:bg-secondary text-gray-700 text-lg py-4`}
+                disabled={isGuessing}
               >
-                Submit Guess
+                {isGuessing ? 'Submitting...' : 'Submit Guess'}
               </Button>
             </form>
             <div className="grid grid-cols-3 gap-2">
-              {HINT_COSTS.map((cost, index) => (
+              {[1, 2, 3].map((hintNumber) => (
                 <Button 
-                  key={index}
+                  key={hintNumber}
                   onClick={handleHint} 
-                  disabled={index !== hintsUsed || points < cost}
+                  disabled={hintsUsed >= hintNumber || points < HINT_COSTS[hintNumber - 1] || isHinting}
                   className={`bg-secondary hover:bg-primary hover:text-primary-foreground text-secondary-foreground text-sm py-2 disabled:opacity-50`}
                 >
                   <Lightbulb className="w-4 h-4 mr-1 tracking-wide" />
-                  Hint {index + 1} (-{cost}p)
+                  {isHinting ? 'Loading...' : `Hint ${hintNumber} (-${HINT_COSTS[hintNumber - 1]}p)`}
                 </Button>
               ))}
             </div>

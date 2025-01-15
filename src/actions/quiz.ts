@@ -33,7 +33,7 @@ export const getQuiz = async () => {
             Query.equal("id",user?.$id),
         ]
     )
-    const quiz = data.documents[0].quiz.map((q:any)=>{
+    const quiz = data.documents[0].quiz.filter((q:any)=>!q.isAnswered).map((q:any)=>{
         return {
             id: q.$id,
             text : q.text,
@@ -43,10 +43,10 @@ export const getQuiz = async () => {
         }
     })
     console.log(quiz);
-    return quiz
+    return {quiz,points:data.documents[0].round_1}
     } catch (error) {
         console.log(error)
-        return []
+        return {quiz:[],points:0}
     }
 }
 

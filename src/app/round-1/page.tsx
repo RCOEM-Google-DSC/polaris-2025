@@ -39,7 +39,10 @@ export default function Home() {
       setId(user?.$id)
     })
     getQuiz().then(data=>{
-      if(data) setQuestions(data!)
+      if(data){ 
+        setQuestions(data.quiz)
+        setScore(data.points)
+      }
         else alert("Something went wrong")
     })
   },[])
@@ -77,20 +80,20 @@ export default function Home() {
           return alert("Error")
         }
         if(data.correct){
+          updateUser(questions[currentQuestion].id,{isAnswered:true,isCorrect:true},id!,score)
           setQuestions(prev=>{
             const quiz = prev.map((q,i)=> i==currentQuestion ? {text:questions[currentQuestion].text
               , options : questions[currentQuestion].options,isCorrect:true,isAnswered:true,id: questions[currentQuestion].id} : q )
             return quiz
           })
-          updateUser(questions[currentQuestion].id,{isAnswered:true,isCorrect:true},id!,score)
           toast.success("Correct Answer")
         }else{
+          updateUser(questions[currentQuestion].id,{isAnswered:true,isCorrect:false},id!,score)
           setQuestions(prev=>{
             const quiz = prev.map((q,i)=> i==currentQuestion ? {text:questions[currentQuestion].text
               , options : questions[currentQuestion].options,isCorrect:false,isAnswered:true,id: questions[currentQuestion].id} : q )
             return quiz
           })
-          updateUser(questions[currentQuestion].id,{isAnswered:true,isCorrect:false},id!,score)
           toast.error("Incorrect Answer. Correct answer is "+data.message)
         }
       })
@@ -143,7 +146,10 @@ export default function Home() {
           question={questions[currentQuestion]}
           selectedOption={selectedOption}
           onSelect={handleOptionSelect}
-        /> : "Not found"
+        /> : <QuizComplete
+        nextRound={'/round-2'}
+        score={score}
+      />
         }
         {questions.length && currentQuestion < questions.length && !questions[currentQuestion].isAnswered && selectedOption && (
           <Button className="w-full" onClick={handleSubmitAnswer}>
