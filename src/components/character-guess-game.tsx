@@ -1,39 +1,49 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Progress } from "@/components/ui/progress"
-import { TOTAL_TIME, INITIAL_POINTS, HINT_COSTS, BLUR_LEVEL, COLORS } from '@/utils/gameUtils'
-import { Star, Clock, Zap, Lightbulb } from 'lucide-react';
-import { QuizComplete } from './QuizComplete';
-import { useRouter } from 'next/navigation';
-import { getLoggedInUser } from '@/appwrite/config';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { startNewGame, validateGuess, getHint } from '@/actions/game-actions';
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Progress } from "@/components/ui/progress";
+import {
+  TOTAL_TIME,
+  INITIAL_POINTS,
+  HINT_COSTS,
+  BLUR_LEVEL,
+  COLORS,
+} from "@/utils/gameUtils";
+import { Star, Clock, Zap, Lightbulb } from "lucide-react";
+import { QuizComplete } from "./QuizComplete";
+import { useRouter } from "next/navigation";
+import { getLoggedInUser } from "@/appwrite/config";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { startNewGame, validateGuess, getHint } from "@/actions/game-actions";
 
 export default function CharacterGuessGame() {
-  const router = useRouter()
+  const router = useRouter();
   const [points, setPoints] = useState(INITIAL_POINTS);
-  const [currentCharacter, setCurrentCharacter] = useState<{ image: string } | undefined>(undefined);
+  const [currentCharacter, setCurrentCharacter] = useState<
+    { image: string } | undefined
+  >(undefined);
   const [hintsUsed, setHintsUsed] = useState(0);
   const [timeLeft, setTimeLeft] = useState(TOTAL_TIME);
-  const [guess, setGuess] = useState('');
+  const [guess, setGuess] = useState("");
   const [gameOver, setGameOver] = useState(false);
-  const [deblurredAreas, setDeblurredAreas] = useState<{ x: number, y: number, radius: number }[]>([]);
+  const [deblurredAreas, setDeblurredAreas] = useState<
+    { x: number; y: number; radius: number }[]
+  >([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isGuessing, setIsGuessing] = useState(false);
   const [isHinting, setIsHinting] = useState(false);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
-    
+
   useEffect(() => {
-    getLoggedInUser().then(user => {
-      if(!user) router.push("/login")
+    getLoggedInUser().then((user) => {
+      if (!user) router.push("/login");
       else initializeGame();
-    })
-  }, [])
+    });
+  }, []);
 
   const initializeGame = async () => {
     setIsLoading(true);
@@ -58,11 +68,11 @@ export default function CharacterGuessGame() {
   };
 
   const handleGuess = useCallback(async () => {
-    if(!guess.toLowerCase()){
+    if (!guess.toLowerCase()) {
       toast.error("Please enter a guess");
       return;
     }
-    
+
     setIsGuessing(true);
     try {
       const result = await validateGuess(guess);
@@ -73,7 +83,7 @@ export default function CharacterGuessGame() {
       }
 
       setPoints(result.points);
-      setGuess('');
+      setGuess("");
       setHintsUsed(0);
       setDeblurredAreas(result.deblurredAreas || []);
       setTimeLeft(TOTAL_TIME);
@@ -105,7 +115,6 @@ export default function CharacterGuessGame() {
       setIsHinting(false);
     }
   }, []);
-  
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -135,29 +144,34 @@ export default function CharacterGuessGame() {
   const drawImage = (img: HTMLImageElement) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-  
-    const ctx = canvas.getContext('2d');
+
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
-  
+
     canvas.width = img.width;
     canvas.height = img.height;
-  
+
     ctx.filter = `blur(${BLUR_LEVEL}px)`;
     ctx.drawImage(img, 0, 0);
-  
-    ctx.filter = 'none';
-    deblurredAreas.forEach(area => {
+
+    ctx.filter = "none";
+    deblurredAreas.forEach((area) => {
       ctx.save();
       ctx.beginPath();
       ctx.filter = `blur(${10}px)`;
-      ctx.arc(area.x * canvas.width / 100, area.y * canvas.height / 100, area.radius * canvas.width / 100, 0, Math.PI * 2);
+      ctx.arc(
+        (area.x * canvas.width) / 100,
+        (area.y * canvas.height) / 100,
+        (area.radius * canvas.width) / 100,
+        0,
+        Math.PI * 2
+      );
       ctx.clip();
-  
+
       ctx.drawImage(img, 0, 0);
       ctx.restore();
     });
   };
-  
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -166,7 +180,9 @@ export default function CharacterGuessGame() {
 
   if (isLoading) {
     return (
-      <div className={`flex flex-col items-center justify-center min-h-[100svh] ${COLORS.background} text-gray-200 p-4`}>
+      <div
+        className={`flex flex-col items-center justify-center min-h-[100svh] ${COLORS.background} text-gray-200 p-4`}
+      >
         <h1 className="text-4xl font-bold mb-6 text-center">Loading Game...</h1>
       </div>
     );
@@ -175,37 +191,52 @@ export default function CharacterGuessGame() {
   if (gameOver) {
     return (
       <QuizComplete
-        nextRound='/'
+        nextRound="/"
         score={points}
       />
     );
   }
 
   return (
-    <div className={`flex flex-col items-center justify-center min-h-[100svh] ${COLORS.background} text-gray-200 p-4`}>
-      <ToastContainer/>
+    <div
+      className={`flex flex-col items-center justify-center min-h-[100svh] bg-[#241743] text-gray-200 p-4`}
+    >
+      <ToastContainer />
       <div className="w-full max-w-4xl">
-        <h1 className="text-4xl font-bold mb-6 text-center">Guess the Character!</h1>
+        <img
+          src="/img/upperpic.png"
+          alt="Header Image"
+          className="w-full h-auto mb-6"
+        />
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className={`flex items-center justify-center p-4 rounded-lg bg-secondary`}>
+          <div
+            className={`flex items-center justify-center p-4 rounded-xl  bg-[#D00242] `}
+          >
             <Star className="w-6 h-6 mr-2" />
             <span className="text-xl font-semibold">Points: {points}</span>
           </div>
-          <div className={`flex items-center justify-center p-4 rounded-lg bg-secondary`}>
+          <div
+            className={`flex items-center justify-center p-4 rounded-xl  bg-[#D00242] `}
+          >
             <Clock className="w-6 h-6 mr-2" />
             <span className="text-xl font-semibold">Time: {timeLeft}s</span>
           </div>
-          <div className={`flex items-center justify-center p-4 rounded-lg bg-secondary`}>
+          <div
+            className={`flex items-center justify-center p-4 rounded-xl  bg-[#D00242] `}
+          >
             <Zap className="w-6 h-6 mr-2" />
-            <span className="text-xl font-semibold">Hints Used: {hintsUsed}/3</span>
+            <span className="text-xl font-semibold">
+              Hints Used: {hintsUsed}/3
+            </span>
           </div>
         </div>
-        
-        <Progress 
-          value={(timeLeft / TOTAL_TIME) * 100} 
+
+        <Progress
+          value={(timeLeft / TOTAL_TIME) * 100}
           className={`h-2 w-full mb-6 bg-primary`}
         />
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div className="relative aspect-square">
             <canvas
@@ -213,40 +244,56 @@ export default function CharacterGuessGame() {
               className="w-full h-full object-contain rounded-lg shadow-lg"
             />
           </div>
-          <div className="flex flex-col justify-center">
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4 mb-4">
+          <div className="flex flex-col justify-center bg-[#D00242] rounded-3xl">
+            <h1 className="text-7xl font-bold text-center mb-4">HELLO</h1>
+            <h1 className="text-2xl font-bold text-center mb-4">my name is </h1>
+            <form
+              onSubmit={handleSubmit}
+              className="flex flex-col gap-4 mb-4 px-4"
+            >
               <Input
                 type="text"
                 value={guess}
                 onChange={(e) => setGuess(e.target.value)}
-                placeholder="Enter character name"
-                className={`flex-grow text-lg p-4 text-gray-200 bg-gray-800 border-gray-700`}
+                className={`flex-grow text-lg p-4 text-black bg-white border-white h-32 rounded-3xl text-center`}
               />
-              <Button 
+              <Button
                 type="submit"
-                className={`bg-primary hover:bg-secondary text-gray-700 text-lg py-4`}
+                className={`bg-primary text-black text-lg  border-white rounded-2xl`}
                 disabled={isGuessing}
               >
-                {isGuessing ? 'Submitting...' : 'Submit Guess'}
+                {isGuessing ? "Submitting..." : "Submit"}
               </Button>
             </form>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-3 gap-2 px-4">
               {[1, 2, 3].map((hintNumber) => (
-                <Button 
+                <Button
                   key={hintNumber}
-                  onClick={handleHint} 
-                  disabled={hintsUsed >= hintNumber || points < HINT_COSTS[hintNumber - 1] || isHinting}
-                  className={`bg-secondary hover:bg-primary hover:text-primary-foreground text-secondary-foreground text-sm py-2 disabled:opacity-50`}
+                  onClick={handleHint}
+                  disabled={
+                    hintsUsed >= hintNumber ||
+                    points < HINT_COSTS[hintNumber - 1] ||
+                    isHinting
+                  }
+                  className={`bg-yellow-500 hover:bg-yellow-300 hover:text-white text-black text-sm py-2 disabled:opacity-50 rounded-xl`}
                 >
                   <Lightbulb className="w-4 h-4 mr-1 tracking-wide" />
-                  {isHinting ? 'Loading...' : `Hint ${hintNumber} (-${HINT_COSTS[hintNumber - 1]}p)`}
+                  {isHinting
+                    ? "Loading..."
+                    : `Hint ${hintNumber} (-${HINT_COSTS[hintNumber - 1]}p)`}
                 </Button>
               ))}
             </div>
           </div>
         </div>
+        <div className="mt-8">
+          <img
+            src="/img/lowerpic.png"
+            alt="Footer Image"
+            className="w-full"
+          />
+        </div>
       </div>
     </div>
   );
 }
-

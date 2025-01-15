@@ -29,32 +29,36 @@ const sections: Record<string, SectionContent> = {
     backgroundImage: "/svg/bg1.svg",
   },
   aptitude: {
-    title: "Web of Knowledge",
-    description: "Test your problem-solving skills with a series of aptitude questions.",
+    title: "WEB OF KNOWLEDGE",
+    description:
+      "Test your problem-solving skills with a series of aptitude questions.",
     image: "/svg/aptitude.svg",
     background: "",
     character: "/svg/gwen2.svg",
     backgroundImage: "/svg/bg1.svg",
   },
   imageGuesser: {
-    title: "Spidey Sense",
-    description: "Put your visual recognition skills to the test with our image guessing challenge.",
+    title: "SPIDEY SENSE",
+    description:
+      "Put your visual recognition skills to the test with our image guessing challenge.",
     image: "/svg/imageguesser.svg",
     background: "",
     character: "/svg/imageguess.svg",
     backgroundImage: "/svg/bg1.svg",
   },
   quizRound: {
-    title: "AlgoWeb",
-    description: "Challenge your knowledge with our comprehensive quiz covering various topics.",
+    title: "ALGOWEB",
+    description:
+      "Challenge your knowledge with our comprehensive quiz covering various topics.",
     image: "/svg/quizround.svg",
     background: "",
     character: "/svg/codeforces.svg",
     backgroundImage: "/svg/bg1.svg",
   },
   flappySpider: {
-    title: "Spiderman: City Chase",
-    description: "Test your gaming skills with our Spider-Man themed endless runner game.",
+    title: "SPIDERMAN: CITY CHASE",
+    description:
+      "Test your gaming skills with our Spider-Man themed endless runner game.",
     image: "/svg/flappyspidey.svg",
     background: "",
     character: "/svg/webspider.svg",
@@ -108,7 +112,10 @@ const HomePage = () => {
           </Button>
         </Link>
         <Link href="/login">
-          <Button variant="outline" className="border-white/20 hover:bg-white/10 font-morgant">
+          <Button
+            variant="outline"
+            className="border-white/20 hover:bg-white/10 font-morgant"
+          >
             SIGN IN
           </Button>
         </Link>
@@ -123,7 +130,9 @@ const HomePage = () => {
         <div className="flex-1 grid grid-cols-[350px_1fr]">
           {/* Left Sidebar */}
           <div className="">
-            <div className="flex flex-col h-[calc(99vh-82px)]"> {/* Adjusted height */}
+            <div className="flex flex-col h-[calc(99vh-82px)]">
+              {" "}
+              {/* Adjusted height */}
               {Object.entries(sections).map(([key, section]) => (
                 <button
                   key={key}
@@ -147,7 +156,7 @@ const HomePage = () => {
                         : "bg-black/50 group-hover:bg-black/30"
                     }`}
                   />
-                  <h2 className="relative z-10 text-2xl font-bold tracking-wider p-2 mt-16 text-left text-white font-morgant">
+                  <h2 className="relative z-10 text-2xl font-bold tracking-wider p-2 mt-16 text-left text-white font-robotoCondensed">
                     {section.title}
                   </h2>
                 </button>
@@ -158,14 +167,18 @@ const HomePage = () => {
           {/* Main Content */}
           <div
             className="relative transition-all duration-500 bg-cover bg-center h-[calc(100vh-64px)]" /* Adjusted height */
-            style={{ backgroundImage: `url(${sections[activeSection].backgroundImage})` }}
+            style={{
+              backgroundImage: `url(${sections[activeSection].backgroundImage})`,
+            }}
           >
-            <div className={`absolute inset-0 ${sections[activeSection].background}`}></div>
+            <div
+              className={`absolute inset-0 ${sections[activeSection].background}`}
+            ></div>
             {renderLogoutButton()}
             <div className="relative h-screen p-16 -mt-48 flex items-center">
               <div className="flex-1 space-y-6 max-w-2xl">
                 <div className="space-y-2">
-                  <h1 className="text-7xl font-bold tracking-wider font-morgant">
+                  <h1 className="text-7xl font-bold tracking-wider font-robotoCondensed">
                     {sections[activeSection].title}
                   </h1>
                   <div className="flex items-center space-x-1">
@@ -173,12 +186,10 @@ const HomePage = () => {
                     <div className="h-1 w-64 bg-white"></div>
                   </div>
                 </div>
-                <p className="text-xl text-gray-300 leading-relaxed font-morgant">
+                <p className="text-xl text-gray-300 leading-relaxed font-poppins">
                   {sections[activeSection].description}
                 </p>
-                <div className="pt-8">
-                  {renderActionButtons()}
-                </div>
+                <div className="pt-8">{renderActionButtons()}</div>
               </div>
             </div>
 
@@ -195,7 +206,7 @@ const HomePage = () => {
             <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-transparent pointer-events-none" />
           </div>
         </div>
-        <Footer/>
+        <Footer />
       </div>
     </>
   );
