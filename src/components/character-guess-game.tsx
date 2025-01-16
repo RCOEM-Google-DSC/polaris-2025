@@ -11,7 +11,7 @@ import {
   BLUR_LEVEL,
   COLORS,
 } from "@/utils/gameUtils";
-import { Star, Clock, Zap, Lightbulb } from "lucide-react";
+import { Star, Clock, Zap, Lightbulb } from 'lucide-react';
 import { QuizComplete } from "./QuizComplete";
 import { useRouter } from "next/navigation";
 import { getLoggedInUser } from "@/appwrite/config";
@@ -26,7 +26,10 @@ export default function CharacterGuessGame() {
     { image: string } | undefined
   >(undefined);
   const [hintsUsed, setHintsUsed] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(TOTAL_TIME);
+  const [timeLeft, setTimeLeft] = useState(() => {
+    const savedTime = localStorage.getItem('timeLeft');
+    return savedTime ? parseInt(savedTime, 10) : TOTAL_TIME;
+  });
   const [guess, setGuess] = useState("");
   const [gameOver, setGameOver] = useState(false);
   const [deblurredAreas, setDeblurredAreas] = useState<
@@ -78,8 +81,9 @@ export default function CharacterGuessGame() {
       const result = await validateGuess(guess);
       if (result.isCorrect) {
         toast.success("Correct Guess!");
+        localStorage.setItem('timeLeft', TOTAL_TIME.toString());
       } else {
-        toast.error("Wrong answer. Try again!");
+        toast.error("Oops! Wrong answer.");
       }
 
       setPoints(result.points);
@@ -121,17 +125,24 @@ export default function CharacterGuessGame() {
     if (timeLeft > 0 && !gameOver && !isLoading && !isGuessing && !isHinting) {
       timer = setInterval(() => {
         setTimeLeft((prevTime) => {
-          if (prevTime <= 1) {
+          const newTime = prevTime <= 1 ? TOTAL_TIME : prevTime - 1;
+          localStorage.setItem('timeLeft', newTime.toString());
+          if (newTime === TOTAL_TIME) {
             clearInterval(timer);
             handleGuess();
-            return TOTAL_TIME;
           }
-          return prevTime - 1;
+          return newTime;
         });
       }, 1000);
     }
     return () => clearInterval(timer);
   }, [timeLeft, gameOver, handleGuess, isLoading, isGuessing, isHinting]);
+
+  useEffect(() => {
+    return () => {
+      localStorage.removeItem('timeLeft');
+    };
+  }, []);
 
   useEffect(() => {
     if (currentCharacter) {
@@ -159,10 +170,12 @@ export default function CharacterGuessGame() {
       ctx.save();
       ctx.beginPath();
       ctx.filter = `blur(${10}px)`;
+      // Increase the radius by multiplying it by 1.5
+      const increasedRadius = (area.radius * canvas.width) / 100 * 1.5;
       ctx.arc(
         (area.x * canvas.width) / 100,
         (area.y * canvas.height) / 100,
-        (area.radius * canvas.width) / 100,
+        increasedRadius,
         0,
         Math.PI * 2
       );
@@ -297,3 +310,4 @@ export default function CharacterGuessGame() {
     </div>
   );
 }
+

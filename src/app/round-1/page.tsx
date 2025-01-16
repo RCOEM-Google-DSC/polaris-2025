@@ -11,7 +11,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getQuiz, updateQuiz, updateUser, validate } from "@/actions/quiz";
 
-const QUESTION_TIME = 60;
+const QUESTION_TIME = 180;
 const MAX_POINTS = 100;
 
 export interface Question {

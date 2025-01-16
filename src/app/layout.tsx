@@ -3,6 +3,15 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { Poppins, Roboto_Condensed } from "next/font/google";
 
+
+import "@mantine/core/styles.css";
+
+import {
+  ColorSchemeScript,
+  MantineProvider,
+  mantineHtmlProps,
+} from "@mantine/core";
+
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -42,11 +51,16 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" {...mantineHtmlProps}>
+      <ColorSchemeScript />
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable} ${robotoCondensed.variable} antialiased`}
+        suppressHydrationWarning
+        
       >
-        {children}
+        <MantineProvider>
+          {children}
+          </MantineProvider>
       </body>
     </html>
   );

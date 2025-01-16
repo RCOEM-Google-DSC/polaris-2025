@@ -2,7 +2,7 @@
 
 import { logout } from "@/actions/logout";
 import { getLoggedInUser } from "@/appwrite/config";
-import { Button } from "@/components/ui/button";
+import { Button } from "@mantine/core";
 import Link from "next/link";
 import { Models } from "node-appwrite";
 import { useEffect, useState } from "react";
@@ -20,7 +20,7 @@ interface SectionContent {
 
 const sections: Record<string, SectionContent> = {
   spidercraft: {
-    title: "SPIDERCRAFT",
+    title: "/svg/spidercraftlogo.svg",  // Changed this line to use the image path
     description:
       "Spidercraft is a 4-round online event that challenges participants' aptitude, image recognition, quiz knowledge, and gaming skills.",
     image: "/svg/spidercraft.svg",
@@ -81,7 +81,9 @@ const HomePage = () => {
       <div className="absolute top-4 right-4 z-10">
         <Button
           onClick={async () => await logout()}
-          className="bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700 font-morgant"
+          fullWidth
+          size="lg"
+          className="button-Sponsor"
         >
           LOG OUT
         </Button>
@@ -94,9 +96,9 @@ const HomePage = () => {
 
     if (user) {
       return (
-        <div className="space-x-4">
+        <div className="space-x-4 flex justify-center items-center left-0 right-0">
           <Link href="/round-1">
-            <Button className="bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700 font-morgant">
+            <Button fullWidth size="lg" className="button-Sponsor">
               Proceed To Rounds
             </Button>
           </Link>
@@ -105,17 +107,14 @@ const HomePage = () => {
     }
 
     return (
-      <div className="space-x-4">
+      <div className="space-x-6 flex ">
         <Link href="/register">
-          <Button className="bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700 font-morgant">
+          <Button fullWidth size="lg" className="button-Sponsor">
             REGISTER
           </Button>
         </Link>
         <Link href="/login">
-          <Button
-            variant="outline"
-            className="border-white/20 hover:bg-white/10 font-morgant"
-          >
+          <Button fullWidth size="lg" className="button-Sponsor">
             SIGN IN
           </Button>
         </Link>
@@ -131,8 +130,6 @@ const HomePage = () => {
           {/* Left Sidebar */}
           <div className="">
             <div className="flex flex-col h-[calc(99vh-82px)]">
-              {" "}
-              {/* Adjusted height */}
               {Object.entries(sections).map(([key, section]) => (
                 <button
                   key={key}
@@ -156,9 +153,17 @@ const HomePage = () => {
                         : "bg-black/50 group-hover:bg-black/30"
                     }`}
                   />
-                  <h2 className="relative z-10 text-2xl font-bold tracking-wider p-2 mt-16 text-left text-white font-robotoCondensed">
-                    {section.title}
-                  </h2>
+                  {key === 'spidercraft' ? (
+                    <img 
+                      src={section.title}
+                      alt="Spidercraft"
+                      className="relative z-10 h-16 mt-16 ml-2"
+                    />
+                  ) : (
+                    <h2 className="relative z-10 text-2xl font-bold tracking-wider p-2 mt-16 text-left text-white font-robotoCondensed">
+                      {section.title}
+                    </h2>
+                  )}
                 </button>
               ))}
             </div>
@@ -166,7 +171,7 @@ const HomePage = () => {
 
           {/* Main Content */}
           <div
-            className="relative transition-all duration-500 bg-cover bg-center h-[calc(100vh-64px)]" /* Adjusted height */
+            className="relative transition-all duration-500 bg-cover bg-center h-[calc(100vh-64px)]"
             style={{
               backgroundImage: `url(${sections[activeSection].backgroundImage})`,
             }}
@@ -178,9 +183,17 @@ const HomePage = () => {
             <div className="relative h-screen p-16 -mt-48 flex items-center">
               <div className="flex-1 space-y-6 max-w-2xl">
                 <div className="space-y-2">
-                  <h1 className="text-7xl font-bold tracking-wider font-robotoCondensed">
-                    {sections[activeSection].title}
-                  </h1>
+                  {activeSection === 'spidercraft' ? (
+                    <img 
+                      src={sections[activeSection].title}
+                      alt="Spidercraft"
+                      className="h-24"
+                    />
+                  ) : (
+                    <h1 className="text-7xl font-bold tracking-wider font-robotoCondensed">
+                      {sections[activeSection].title}
+                    </h1>
+                  )}
                   <div className="flex items-center space-x-1">
                     <div className="h-1 w-64 bg-red-600"></div>
                     <div className="h-1 w-64 bg-white"></div>

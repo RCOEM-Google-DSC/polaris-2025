@@ -45,3 +45,25 @@
     @apply bg-background text-foreground;
   }
 }
+
+.button-Sponsor {
+  appearance: button;
+  background-color: #ff4f4f !important;
+  background-image: none;
+  border-radius: 8px;
+  box-shadow: #000 6px 6px 0 0, #fff 6px 6px 0 1px;
+  color: #000 !important;
+  cursor: pointer;
+  display: inline-block;
+  font-family: "Space Grotesk", Arial, sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 20px;
+  overflow: visible;
+  text-align: left;
+  text-transform: none;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  vertical-align: left;
+}

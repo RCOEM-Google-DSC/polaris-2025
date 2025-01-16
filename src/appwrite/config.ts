@@ -6,7 +6,7 @@ import { cookies } from "next/headers";
 export async function createSessionClient() {
     const client = new Client()
     .setEndpoint('https://cloud.appwrite.io/v1')
-    .setProject('666a70150006c139d9d6')     
+    .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT!)
     const session = cookies().get("gdg-session")
     if (!session || !session.value) {
         throw new Error("No Session")

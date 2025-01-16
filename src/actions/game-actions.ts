@@ -5,7 +5,7 @@ import { Query } from "node-appwrite";
 import { v4 as uuidv4 } from "uuid";
 
 const characters = [
-  { name: "vemon", image: "img/venom.jpg" },
+  { name: "venom", image: "img/venom.jpg" },
   { name: "mysterio", image: "img/img2.jpeg" },
   { name: "goblin", image: "img/img3.jpeg" },
   { name: "sandman", image: "img/img4.jpeg" },
