@@ -10,7 +10,7 @@ import {
   BLUR_LEVEL,
   COLORS,
 } from "@/utils/gameUtils";
-import { Star, Clock, Zap, Lightbulb } from 'lucide-react';
+import { Star, Clock, Zap, Lightbulb } from "lucide-react";
 import { QuizComplete } from "./QuizComplete";
 import { useRouter } from "next/navigation";
 import { getLoggedInUser } from "@/appwrite/config";
@@ -31,11 +31,13 @@ interface DeblurredArea {
 export default function CharacterGuessGame() {
   const router = useRouter();
   const [points, setPoints] = useState<number>(INITIAL_POINTS);
-  const [currentCharacter, setCurrentCharacter] = useState<Character | null>(null);
+  const [currentCharacter, setCurrentCharacter] = useState<Character | null>(
+    null
+  );
   const [hintsUsed, setHintsUsed] = useState<number>(0);
   const [timeLeft, setTimeLeft] = useState<number>(() => {
-    if (typeof window !== 'undefined') {
-      const savedTime = localStorage.getItem('timeLeft');
+    if (typeof window !== "undefined") {
+      const savedTime = localStorage.getItem("timeLeft");
       return savedTime ? parseInt(savedTime, 10) : TOTAL_TIME;
     }
     return TOTAL_TIME;
@@ -89,8 +91,8 @@ export default function CharacterGuessGame() {
       const result = await validateGuess(guess);
       if (result.isCorrect) {
         toast.success("Correct Guess!");
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('timeLeft', TOTAL_TIME.toString());
+        if (typeof window !== "undefined") {
+          localStorage.setItem("timeLeft", TOTAL_TIME.toString());
         }
       } else {
         toast.error("Oops! Wrong answer.");
@@ -137,8 +139,8 @@ export default function CharacterGuessGame() {
       timer = setInterval(() => {
         setTimeLeft((prevTime: number) => {
           const newTime = prevTime <= 1 ? TOTAL_TIME : prevTime - 1;
-          if (typeof window !== 'undefined') {
-            localStorage.setItem('timeLeft', newTime.toString());
+          if (typeof window !== "undefined") {
+            localStorage.setItem("timeLeft", newTime.toString());
           }
           if (newTime === TOTAL_TIME) {
             clearInterval(timer);
@@ -153,8 +155,8 @@ export default function CharacterGuessGame() {
 
   useEffect(() => {
     return () => {
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('timeLeft');
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("timeLeft");
       }
     };
   }, []);
@@ -185,7 +187,7 @@ export default function CharacterGuessGame() {
       ctx.save();
       ctx.beginPath();
       ctx.filter = `blur(${10}px)`;
-      const increasedRadius = (area.radius * canvas.width) / 100 * 1.5;
+      const increasedRadius = ((area.radius * canvas.width) / 100) * 1.5;
       ctx.arc(
         (area.x * canvas.width) / 100,
         (area.y * canvas.height) / 100,
@@ -207,18 +209,27 @@ export default function CharacterGuessGame() {
 
   if (isLoading) {
     return (
-      <div className={`flex flex-col items-center justify-center min-h-[100svh] ${COLORS.background} text-gray-200 p-4`}>
+      <div
+        className={`flex flex-col items-center justify-center min-h-[100svh] ${COLORS.background} text-gray-200 p-4`}
+      >
         <h1 className="text-4xl font-bold mb-6 text-center">Loading Game...</h1>
       </div>
     );
   }
 
   if (gameOver) {
-    return <QuizComplete nextRound="/" score={points} />;
+    return (
+      <QuizComplete
+        nextRound="/round-3"
+        score={points}
+      />
+    );
   }
 
   return (
-    <div className={`flex flex-col items-center justify-center min-h-[100svh] bg-[#241743] text-gray-200 p-4`}>
+    <div
+      className={`flex flex-col items-center justify-center min-h-[100svh] bg-[#241743] text-gray-200 p-4`}
+    >
       <ToastContainer />
       <div className="w-full max-w-4xl">
         <img
@@ -228,17 +239,25 @@ export default function CharacterGuessGame() {
         />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className={`flex items-center justify-center p-4 rounded-xl bg-[#D00242]`}>
+          <div
+            className={`flex items-center justify-center p-4 rounded-xl bg-[#D00242]`}
+          >
             <Star className="w-6 h-6 mr-2" />
             <span className="text-xl font-semibold">Points: {points}</span>
           </div>
-          <div className={`flex items-center justify-center p-4 rounded-xl bg-[#D00242]`}>
+          <div
+            className={`flex items-center justify-center p-4 rounded-xl bg-[#D00242]`}
+          >
             <Clock className="w-6 h-6 mr-2" />
             <span className="text-xl font-semibold">Time: {timeLeft}s</span>
           </div>
-          <div className={`flex items-center justify-center p-4 rounded-xl bg-[#D00242]`}>
+          <div
+            className={`flex items-center justify-center p-4 rounded-xl bg-[#D00242]`}
+          >
             <Zap className="w-6 h-6 mr-2" />
-            <span className="text-xl font-semibold">Hints Used: {hintsUsed}/3</span>
+            <span className="text-xl font-semibold">
+              Hints Used: {hintsUsed}/3
+            </span>
           </div>
         </div>
 
@@ -257,7 +276,10 @@ export default function CharacterGuessGame() {
           <div className="flex flex-col justify-center bg-[#D00242] rounded-3xl">
             <h1 className="text-7xl font-bold text-center mb-4">HELLO</h1>
             <h1 className="text-2xl font-bold text-center mb-4">my name is </h1>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4 mb-4 px-4">
+            <form
+              onSubmit={handleSubmit}
+              className="flex flex-col gap-4 mb-4 px-4"
+            >
               <Input
                 type="text"
                 value={guess}

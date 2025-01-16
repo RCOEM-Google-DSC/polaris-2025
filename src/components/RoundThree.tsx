@@ -1,48 +1,47 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import Countdown from 'react-countdown'
-import { updateUserScore } from '@/actions/round-3'
-import { getLoggedInUser } from '@/appwrite/config'
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Countdown from "react-countdown";
+import { updateUserScore } from "@/actions/round-3";
+import { getLoggedInUser } from "@/appwrite/config";
 
 export default function RoundThree() {
-  const [startTime, setStartTime] = useState<number | null>(null)
-  const [score, setScore] = useState(0)
-  const [userId, setUserId] = useState<string | null>(null)
-  const router = useRouter()
+  const [startTime, setStartTime] = useState<number | null>(null);
+  const [score, setScore] = useState(0);
+  const [userId, setUserId] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const initializeRound = async () => {
-      const storedStartTime = localStorage.getItem('roundThreeStartTime')
-      const storedUserId = localStorage.getItem('userId')
+      const storedStartTime = localStorage.getItem("roundThreeStartTime");
+      const storedUserId = localStorage.getItem("userId");
       if (storedStartTime && storedUserId) {
-        setStartTime(parseInt(storedStartTime, 10))
-        setUserId(storedUserId)
+        setStartTime(parseInt(storedStartTime, 10));
+        setUserId(storedUserId);
       } else {
-        const now = Date.now()
-        setStartTime(now)
-        localStorage.setItem('roundThreeStartTime', now.toString())
+        const now = Date.now();
+        setStartTime(now);
+        localStorage.setItem("roundThreeStartTime", now.toString());
         // In a real application, you'd get the user ID from your auth system
-        getLoggedInUser().then((user)=>{
-          if (!user) return
-          setUserId(user.$id)
-          localStorage.setItem('userId', user.$id)
-        })
+        getLoggedInUser().then((user) => {
+          if (!user) return;
+          setUserId(user.$id);
+          localStorage.setItem("userId", user.$id);
+        });
         // setUserId(newUserId)
-      
       }
-    }
+    };
 
-    initializeRound()
-  }, [])
+    initializeRound();
+  }, []);
 
   const fetchLeaderboard = async () => {
     try {
-      const response = await fetch(`http://98.70.74.68:5000/leaderboard`)
-      const user = await getLoggedInUser()
+      const response = await fetch(`http://98.70.74.68:5000/leaderboard`);
+      const user = await getLoggedInUser();
       if (!user) {
-        return
+        return;
       }
       // {
       //   method: 'GET',
@@ -50,37 +49,52 @@ export default function RoundThree() {
       //     'Access-Control-Allow-Origin': '*',
       //   }
       // }
-    
-      const data = await response.json()
-      const currentUserScore = data.models.find((model: any) => model.hacker === user.name)?.score || 5
-      setScore(currentUserScore)
+
+      const data = await response.json();
+      const currentUserScore =
+        data.models.find((model: any) => model.hacker === user.name)?.score ||
+        5;
+      setScore(currentUserScore);
       if (userId) {
-        await updateUserScore(userId, currentUserScore)
+        await updateUserScore(userId, currentUserScore);
       }
     } catch (error) {
-      console.error('Error fetching leaderboard:', error)
+      console.error("Error fetching leaderboard:", error);
     }
-  }
+  };
 
   const handleComplete = () => {
-    localStorage.removeItem('roundThreeStartTime')
-    localStorage.removeItem('userId')
-    router.push('/leaderboard')
-  }
+    localStorage.removeItem("roundThreeStartTime");
+    localStorage.removeItem("userId");
+    router.push("/leaderboard");
+  };
 
-  const renderer = ({ minutes, seconds, completed }: { minutes: number, seconds: number, completed: boolean }) => {
+  const renderer = ({
+    minutes,
+    seconds,
+    completed,
+  }: {
+    minutes: number;
+    seconds: number;
+    completed: boolean;
+  }) => {
     if (completed) {
-      return <div className="text-4xl font-bold">Time's up! Final score: {score}</div>
+      return (
+        <div className="text-4xl font-bold">
+          Time's up! Final score: {score}
+        </div>
+      );
     } else {
       return (
         <div className="text-6xl font-bold">
-          {minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')}
+          {minutes.toString().padStart(2, "0")}:
+          {seconds.toString().padStart(2, "0")}
         </div>
-      )
+      );
     }
-  }
+  };
 
-  if (!startTime) return <div className="text-white">Loading...</div>
+  if (!startTime) return <div className="text-white">Loading...</div>;
 
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center bg-[url('/spiderweb-background.jpg')] bg-cover bg-center">
@@ -92,20 +106,45 @@ export default function RoundThree() {
           onComplete={handleComplete}
           onTick={() => {
             if (Date.now() - startTime! >= 1 * 60 * 1000) {
-              fetchLeaderboard()
+              fetchLeaderboard();
             }
           }}
         />
         <div className="mt-8 text-2xl">Current Score: {score}</div>
+        <button
+          onClick={() =>
+            window.open(
+              "http://www.hackerrank.com/spider-sums-showdown",
+              "_blank"
+            )
+          }
+          className="bg-black text-white font-bold py-2 px-4 rounded "
+        >
+          Round 3 FY
+        </button>
+        <div className="mt-8 text-2xl"></div>
+        <button
+          onClick={() =>
+            window.open(
+              "http://www.hackerrank.com/spider-sums-showdown-sy",
+              "_blank"
+            )
+          }
+          className="bg-black text-white font-bold py-2 px-4 rounded "
+        >
+          Round 3 SY
+        </button>
         {startTime && Date.now() - startTime >= 40 * 60 * 1000 && (
           <div className="mt-8">
-            <a href="/leaderboard" className="text-xl text-blue-300 hover:text-blue-100 underline">
+            <a
+              href="/leaderboard"
+              className="text-xl text-blue-300 hover:text-blue-100 underline"
+            >
               View Leaderboard
             </a>
           </div>
         )}
       </div>
     </div>
-  )
+  );
 }
-
