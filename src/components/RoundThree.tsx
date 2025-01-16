@@ -39,16 +39,20 @@ export default function RoundThree() {
 
   const fetchLeaderboard = async () => {
     try {
-      const response = await fetch(`https://www.hackerrank.com/rest/contests/spidercraft-test/leaderboard?offset=0&limit=10&_=${Date.now()}`,
+      const response = await fetch(`http://98.70.74.68:5000/leaderboard`)
+      const user = await getLoggedInUser()
+      if (!user) {
+        return
+      }
       // {
       //   method: 'GET',
       //   headers: {
       //     'Access-Control-Allow-Origin': '*',
       //   }
       // }
-    )
+    
       const data = await response.json()
-      const currentUserScore = data.models.find((model: any) => model.hacker === 'singhaditya4')?.score || 5
+      const currentUserScore = data.models.find((model: any) => model.hacker === user.name)?.score || 5
       setScore(currentUserScore)
       if (userId) {
         await updateUserScore(userId, currentUserScore)
