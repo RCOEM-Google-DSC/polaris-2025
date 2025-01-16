@@ -28,7 +28,7 @@ export async function fetchAndUpdateScore() {
         if (result.total > 0) {
           // Update the user's round_4 score
           await db.updateDocument(process.env.NEXT_PUBLIC_APPWRITE_DB!, process.env.NEXT_PUBLIC_APPWRITE_USERS!,result.documents[0].$id, {
-            round_4: Math.floor(scoreData.score) // Ensure it's an integer
+            round_4: Math.floor(scoreData.score * 100) // Ensure it's an integer
           })
         }
       } catch (error) {
