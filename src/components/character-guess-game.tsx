@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,25 +18,34 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { startNewGame, validateGuess, getHint } from "@/actions/game-actions";
 
+interface Character {
+  image: string;
+}
+
+interface DeblurredArea {
+  x: number;
+  y: number;
+  radius: number;
+}
+
 export default function CharacterGuessGame() {
   const router = useRouter();
-  const [points, setPoints] = useState(INITIAL_POINTS);
-  const [currentCharacter, setCurrentCharacter] = useState<
-    { image: string } | undefined
-  >(undefined);
-  const [hintsUsed, setHintsUsed] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(() => {
-    const savedTime = localStorage.getItem('timeLeft');
-    return savedTime ? parseInt(savedTime, 10) : TOTAL_TIME;
+  const [points, setPoints] = useState<number>(INITIAL_POINTS);
+  const [currentCharacter, setCurrentCharacter] = useState<Character | null>(null);
+  const [hintsUsed, setHintsUsed] = useState<number>(0);
+  const [timeLeft, setTimeLeft] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      const savedTime = localStorage.getItem('timeLeft');
+      return savedTime ? parseInt(savedTime, 10) : TOTAL_TIME;
+    }
+    return TOTAL_TIME;
   });
-  const [guess, setGuess] = useState("");
-  const [gameOver, setGameOver] = useState(false);
-  const [deblurredAreas, setDeblurredAreas] = useState<
-    { x: number; y: number; radius: number }[]
-  >([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isGuessing, setIsGuessing] = useState(false);
-  const [isHinting, setIsHinting] = useState(false);
+  const [guess, setGuess] = useState<string>("");
+  const [gameOver, setGameOver] = useState<boolean>(false);
+  const [deblurredAreas, setDeblurredAreas] = useState<DeblurredArea[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isGuessing, setIsGuessing] = useState<boolean>(false);
+  const [isHinting, setIsHinting] = useState<boolean>(false);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -54,13 +62,13 @@ export default function CharacterGuessGame() {
       const result = await startNewGame();
       if (result.gameOver) {
         setGameOver(true);
-        setPoints(result.points!);
+        setPoints(result.points ?? INITIAL_POINTS);
       } else {
         const { currentCharacter, deblurredAreas, hintsUsed, points } = result;
-        setCurrentCharacter(currentCharacter);
-        setDeblurredAreas(deblurredAreas!);
-        setHintsUsed(hintsUsed!);
-        setPoints(points!);
+        setCurrentCharacter(currentCharacter ?? null);
+        setDeblurredAreas(deblurredAreas ?? []);
+        setHintsUsed(hintsUsed ?? 0);
+        setPoints(points ?? INITIAL_POINTS);
       }
     } catch (error) {
       console.error("Failed to start new game:", error);
@@ -81,21 +89,23 @@ export default function CharacterGuessGame() {
       const result = await validateGuess(guess);
       if (result.isCorrect) {
         toast.success("Correct Guess!");
-        localStorage.setItem('timeLeft', TOTAL_TIME.toString());
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('timeLeft', TOTAL_TIME.toString());
+        }
       } else {
         toast.error("Oops! Wrong answer.");
       }
 
-      setPoints(result.points);
+      setPoints(result.points ?? points);
       setGuess("");
       setHintsUsed(0);
-      setDeblurredAreas(result.deblurredAreas || []);
+      setDeblurredAreas(result.deblurredAreas ?? []);
       setTimeLeft(TOTAL_TIME);
 
       if (result.gameOver) {
         setGameOver(true);
       } else {
-        setCurrentCharacter(result.nextCharacter);
+        setCurrentCharacter(result.nextCharacter ?? null);
       }
     } catch (error) {
       console.error("Error validating guess:", error);
@@ -103,30 +113,33 @@ export default function CharacterGuessGame() {
     } finally {
       setIsGuessing(false);
     }
-  }, [guess]);
+  }, [guess, points]);
 
   const handleHint = useCallback(async () => {
     setIsHinting(true);
     try {
       const result = await getHint();
-      setPoints(result.points);
-      setHintsUsed(result.hintsUsed);
-      setDeblurredAreas(result.deblurredAreas);
+      setPoints(result.points ?? points);
+      setHintsUsed(result.hintsUsed ?? hintsUsed);
+      setDeblurredAreas(result.deblurredAreas ?? deblurredAreas);
     } catch (error) {
       console.error("Error getting hint:", error);
       toast.error("Unable to get hint. Try again later.");
     } finally {
       setIsHinting(false);
     }
-  }, []);
+  }, [points, hintsUsed, deblurredAreas]);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
+
     if (timeLeft > 0 && !gameOver && !isLoading && !isGuessing && !isHinting) {
       timer = setInterval(() => {
-        setTimeLeft((prevTime) => {
+        setTimeLeft((prevTime: number) => {
           const newTime = prevTime <= 1 ? TOTAL_TIME : prevTime - 1;
-          localStorage.setItem('timeLeft', newTime.toString());
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('timeLeft', newTime.toString());
+          }
           if (newTime === TOTAL_TIME) {
             clearInterval(timer);
             handleGuess();
@@ -140,7 +153,9 @@ export default function CharacterGuessGame() {
 
   useEffect(() => {
     return () => {
-      localStorage.removeItem('timeLeft');
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('timeLeft');
+      }
     };
   }, []);
 
@@ -170,7 +185,6 @@ export default function CharacterGuessGame() {
       ctx.save();
       ctx.beginPath();
       ctx.filter = `blur(${10}px)`;
-      // Increase the radius by multiplying it by 1.5
       const increasedRadius = (area.radius * canvas.width) / 100 * 1.5;
       ctx.arc(
         (area.x * canvas.width) / 100,
@@ -193,27 +207,18 @@ export default function CharacterGuessGame() {
 
   if (isLoading) {
     return (
-      <div
-        className={`flex flex-col items-center justify-center min-h-[100svh] ${COLORS.background} text-gray-200 p-4`}
-      >
+      <div className={`flex flex-col items-center justify-center min-h-[100svh] ${COLORS.background} text-gray-200 p-4`}>
         <h1 className="text-4xl font-bold mb-6 text-center">Loading Game...</h1>
       </div>
     );
   }
 
   if (gameOver) {
-    return (
-      <QuizComplete
-        nextRound="/"
-        score={points}
-      />
-    );
+    return <QuizComplete nextRound="/" score={points} />;
   }
 
   return (
-    <div
-      className={`flex flex-col items-center justify-center min-h-[100svh] bg-[#241743] text-gray-200 p-4`}
-    >
+    <div className={`flex flex-col items-center justify-center min-h-[100svh] bg-[#241743] text-gray-200 p-4`}>
       <ToastContainer />
       <div className="w-full max-w-4xl">
         <img
@@ -223,25 +228,17 @@ export default function CharacterGuessGame() {
         />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div
-            className={`flex items-center justify-center p-4 rounded-xl  bg-[#D00242] `}
-          >
+          <div className={`flex items-center justify-center p-4 rounded-xl bg-[#D00242]`}>
             <Star className="w-6 h-6 mr-2" />
             <span className="text-xl font-semibold">Points: {points}</span>
           </div>
-          <div
-            className={`flex items-center justify-center p-4 rounded-xl  bg-[#D00242] `}
-          >
+          <div className={`flex items-center justify-center p-4 rounded-xl bg-[#D00242]`}>
             <Clock className="w-6 h-6 mr-2" />
             <span className="text-xl font-semibold">Time: {timeLeft}s</span>
           </div>
-          <div
-            className={`flex items-center justify-center p-4 rounded-xl  bg-[#D00242] `}
-          >
+          <div className={`flex items-center justify-center p-4 rounded-xl bg-[#D00242]`}>
             <Zap className="w-6 h-6 mr-2" />
-            <span className="text-xl font-semibold">
-              Hints Used: {hintsUsed}/3
-            </span>
+            <span className="text-xl font-semibold">Hints Used: {hintsUsed}/3</span>
           </div>
         </div>
 
@@ -260,10 +257,7 @@ export default function CharacterGuessGame() {
           <div className="flex flex-col justify-center bg-[#D00242] rounded-3xl">
             <h1 className="text-7xl font-bold text-center mb-4">HELLO</h1>
             <h1 className="text-2xl font-bold text-center mb-4">my name is </h1>
-            <form
-              onSubmit={handleSubmit}
-              className="flex flex-col gap-4 mb-4 px-4"
-            >
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4 mb-4 px-4">
               <Input
                 type="text"
                 value={guess}
@@ -272,7 +266,7 @@ export default function CharacterGuessGame() {
               />
               <Button
                 type="submit"
-                className={`bg-primary text-black text-lg  border-white rounded-2xl`}
+                className={`bg-primary text-black text-lg border-white rounded-2xl`}
                 disabled={isGuessing}
               >
                 {isGuessing ? "Submitting..." : "Submit"}
@@ -310,4 +304,3 @@ export default function CharacterGuessGame() {
     </div>
   );
 }
-
