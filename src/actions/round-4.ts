@@ -17,11 +17,12 @@ export async function fetchAndUpdateScore() {
     const data = await response.json()
     
     // Process each score
-    for (const scoreData of data.result) {
+    // const scoreData = data.result.find((score: ScoreData) => score.user === user?.name)
+    for(const scoreData of data.result) {
       try {
         // Get user from Appwrite
         const result = await db.listDocuments(process.env.NEXT_PUBLIC_APPWRITE_DB!, process.env.NEXT_PUBLIC_APPWRITE_USERS!, [
-            Query.equal('id', user?.$id!)
+            Query.equal('name', scoreData?.user)
           ]);     
         
         if (result.total > 0) {

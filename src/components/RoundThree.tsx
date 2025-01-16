@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import Countdown from 'react-countdown'
 import { updateUserScore } from '@/actions/round-3'
 import { getLoggedInUser } from '@/appwrite/config'
-import { set } from 'date-fns'
 
 export default function RoundThree() {
   const [startTime, setStartTime] = useState<number | null>(null)
